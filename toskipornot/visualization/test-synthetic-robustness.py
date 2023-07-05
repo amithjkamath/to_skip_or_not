@@ -7,7 +7,6 @@ import os
 from glob import glob
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import torch
 
 from monai.transforms import (
@@ -22,8 +21,12 @@ from monai.transforms import (
 
 from monai.networks.nets import UNet, AttentionUnet
 from monai.networks.layers import Norm
-from monai.metrics import DiceMetric, HausdorffDistanceMetric
-from monai.inferers import sliding_window_inference
+from monai.metrics import (
+    DiceMetric,
+    HausdorffDistanceMetric,
+    SurfaceDiceMetric,
+    SurfaceDistanceMetric,
+)
 from monai.data import Dataset, DataLoader, decollate_batch, list_data_collate
 from monai.config import print_config
 from toskipornot.models.NoSkipUnet import NoSkipUNet
@@ -43,22 +46,18 @@ def test_robustness(root_dir, net, model_path, output_folder):
         "alphablend_0p60_normal",
         "alphablend_0p70_normal",
         "alphablend_0p80_normal",
-        "alphablend_0p82_normal",
-        "alphablend_0p85_normal",
-        "alphablend_0p88_normal",
         "alphablend_0p90_normal",
-        "alphablend_0p92_normal",
-        "alphablend_0p95_normal",
-        "alphablend_0p98_normal",
     ]
 
     dice_results = {}
     hd_results = {}
+    sdsc_results = {}
+    surfdist_results = {}
 
     for variation in data_variations:
         print("For data in range: ", variation)
         train_data_dir = os.path.join(
-            root_dir, "data", "background-processed", variation
+            root_dir, "data", "foreground-processed", variation
         )
         images = sorted(glob(os.path.join(train_data_dir, "train", "*")))
         masks = sorted(glob(os.path.join(train_data_dir, "mask", "*")))
@@ -115,20 +114,6 @@ def test_robustness(root_dir, net, model_path, output_folder):
                 act="ReLU",
                 # bias=False,
             ),
-            "unetr_model_params": dict(
-                spatial_dims=2,
-                in_channels=1,
-                out_channels=2,
-                img_size=(256, 256),
-                feature_size=16,
-                hidden_size=768,
-                mlp_dim=3072,
-                num_heads=12,
-                pos_embed="perceptron",
-                norm_name="instance",
-                res_block=True,
-                dropout_rate=0.0,
-            ),
         }
 
         if net == "AttentionUNet":
@@ -137,8 +122,6 @@ def test_robustness(root_dir, net, model_path, output_folder):
             model = NoSkipUNet(**config["noskipunet_model_params"]).to(device)
         elif net == "unet":
             model = UNet(**config["unet_model_params"]).to(device)
-        elif net == "UNETR":
-            model = UNETR(**config["unetr_model_params"]).to(device)
         model.load_state_dict(
             torch.load(
                 os.path.join(model_path, "best_metric_model_segmentation2d_dict.pth")
@@ -149,9 +132,22 @@ def test_robustness(root_dir, net, model_path, output_folder):
         dice_metric = DiceMetric(
             include_background=True, reduction="mean", get_not_nans=False
         )
+        dice_metric.reset()
+
         hausdorff_metric = HausdorffDistanceMetric(
             include_background=True, reduction="mean"
         )
+        hausdorff_metric.reset()
+
+        surface_dsc_metric = SurfaceDiceMetric(
+            [5], include_background=True, reduction="mean"
+        )
+        surface_dsc_metric.reset()
+
+        surface_distance_metric = SurfaceDistanceMetric(
+            symmetric=True, include_background=True, reduction="mean"
+        )
+        surface_distance_metric.reset()
 
         post_trans = Compose([Activations(sigmoid=True), AsDiscrete(threshold=0.5)])
 
@@ -174,6 +170,8 @@ def test_robustness(root_dir, net, model_path, output_folder):
 
         test_dice_mean = []
         test_hausdorff_mean = []
+        test_surfacedice_mean = []
+        test_surfacedistance_mean = []
 
         with torch.no_grad():
             for test_data in test_loader:
@@ -192,8 +190,18 @@ def test_robustness(root_dir, net, model_path, output_folder):
                 hd_metric = hausdorff_metric.aggregate().item()
                 hausdorff_metric.reset()
 
+                surface_dsc_metric(y_pred=test_outputs, y=test_labels)
+                surface_dsc_value = surface_dsc_metric.aggregate().item()
+                surface_dsc_metric.reset()
+
+                surface_distance_metric(y_pred=test_outputs, y=test_labels)
+                surface_distance_value = surface_distance_metric.aggregate().item()
+                surface_distance_metric.reset()
+
                 test_dice_mean.append(dsc_metric)
                 test_hausdorff_mean.append(hd_metric)
+                test_surfacedice_mean.append(surface_dsc_value)
+                test_surfacedistance_mean.append(surface_distance_value)
 
                 for test_output in test_outputs:
                     output_saver(np.multiply(test_output, 255))
@@ -202,26 +210,34 @@ def test_robustness(root_dir, net, model_path, output_folder):
 
         dice_results[variation] = np.mean(test_dice_mean)
         hd_results[variation] = np.mean(test_hausdorff_mean)
+        sdsc_results[variation] = np.mean(test_surfacedice_mean)
+        surfdist_results[variation] = np.mean(test_surfacedistance_mean)
 
-    return dice_results, hd_results
+    return dice_results, hd_results, sdsc_results, surfdist_results
 
 
 if __name__ == "__main__":
     print_config()
-    root_dir = "/Users/amithkamath/repo/toskipornot/"
-    model_path = os.path.join(root_dir, "reports/synthetic-background-experiments/")
+    root_dir = "/Users/amithkamath/repo/to_skip_or_not/"
+    model_path = os.path.join(root_dir, "models/synthetic-foreground-experiments/")
 
-    for net in ["AttentionUNet"]:
+    for net in ["AttentionUNet", "unet", "NoSkipUNet"]:
         dice_for_model = {}
         hd_for_model = {}
+        sdsc_for_model = {}
+        surfdist_for_model = {}
 
-        for idx in [10, 20, 30, 40, 50, 60, 70, 80, 82, 85, 88, 90, 92, 95, 98]:
+        for idx in [10, 20, 30, 40, 50, 60, 70, 80, 90]:
             train_model_name = "alphablend_0p" + str(idx).zfill(2) + "_normal_seed_1"
             output_path = os.path.join(
-                root_dir, "reports", "robustness_results", net, train_model_name
+                root_dir,
+                "reports",
+                "foreground-robustness_results",
+                net,
+                train_model_name,
             )
             os.makedirs(output_path, exist_ok=True)
-            dice, hd = test_robustness(
+            dice, hd, sdsc, surfdist = test_robustness(
                 root_dir,
                 net,
                 os.path.join(model_path, net + "_dice_" + train_model_name),
@@ -229,9 +245,15 @@ if __name__ == "__main__":
             )
             dice_for_model[train_model_name] = dice
             hd_for_model[train_model_name] = hd
+            sdsc_for_model[train_model_name] = sdsc
+            surfdist_for_model[train_model_name] = surfdist
 
         dice_df = pd.DataFrame.from_dict(dice_for_model)
         hd_df = pd.DataFrame.from_dict(hd_for_model)
+        sdsc_df = pd.DataFrame.from_dict(sdsc_for_model)
+        surfdist_df = pd.DataFrame.from_dict(surfdist_for_model)
 
         dice_df.to_csv("dice_for_" + net + ".csv")
         hd_df.to_csv("hd_for_" + net + ".csv")
+        sdsc_df.to_csv("sdsc_for_" + net + ".csv")
+        surfdist_df.to_csv("surfdist_for_" + net + ".csv")
