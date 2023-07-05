@@ -7,7 +7,7 @@ from toskipornot.features.analyze_features import *
 
 
 if __name__ == "__main__":
-    root_dir = "/Users/amithkamath/repo/toskipornot"
+    root_dir = "/Users/amithkamath/repo/to_skip_or_not"
     data_path = os.path.join(root_dir, "data", "foreground-processed")
 
     fig, ax = plt.subplots()
@@ -46,9 +46,9 @@ if __name__ == "__main__":
     plt.ylabel("Density")
     plt.xscale("log")
     plt.grid()
-    ax.set_xlim(5e-3, 1e0)
+    ax.set_xlim(1e-3, 1e0)
     ax.legend(
-        ("0.9", "0.8", "0.7", "0.6", "0.5", "0.4", "0.3", "0.2", "0.1"),
+        ("0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9"),
         loc="center left",
         bbox_to_anchor=(0.95, 0.5),
     )
