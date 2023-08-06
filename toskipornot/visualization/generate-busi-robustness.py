@@ -5,17 +5,6 @@ import pandas as pd
 
 import torch
 
-from monai.transforms import (
-    Activations,
-    AsDiscrete,
-    EnsureChannelFirstd,
-    Compose,
-    LoadImaged,
-    ScaleIntensityd,
-    SaveImage,
-)
-
-from monai.networks.nets import AttentionUnet, UNet, BasicUNetPlusPlus, VNet
 from monai.metrics import (
     DiceMetric,
     HausdorffDistanceMetric,
@@ -24,16 +13,7 @@ from monai.metrics import (
 )
 from monai.data import Dataset, DataLoader, decollate_batch, list_data_collate
 
-from toskipornot.models.NoSkipUnet import NoSkipUNet
-from toskipornot.models.NoSkipVnet import NoSkipVNet
 from toskipornot.features.analyze_features import *
-
-
-def find_split(n_images):
-    fold_state = list()
-    for idx in range(1, n_images + 1):
-        fold_state.append("test")
-    return fold_state
 
 
 def run_segmentation(model, config, images, labels, output_path, variant, seed_num):
@@ -161,7 +141,7 @@ def generate_plots(data_path, model_path, output_path, model_name, variant, seed
     )
     model.eval()
 
-    fold_state = find_split(len(images))
+    fold_state = find_split(config, len(images))
     (
         dice_scores,
         hd_scores,
@@ -206,8 +186,8 @@ def generate_plots(data_path, model_path, output_path, model_name, variant, seed
 
 
 if __name__ == "__main__":
-    root_dir = "/Users/amithkamath/repo/to_skip_or_not/"
-    model_dir = os.path.join(root_dir, "reports", "busi-v5")
+    root_dir = "/home/akamath/Documents/toskipornot/"
+    model_dir = os.path.join(root_dir, "reports", "busi-v4")
     output_path = os.path.join(root_dir, "reports", "BUSI-results")
     for variant in ["lower", "low", "in-domain", "high", "higher"]:
         for seed_num in [1, 2, 3]:
