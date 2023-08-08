@@ -19,7 +19,7 @@ from monai.transforms import (
     SaveImage,
 )
 
-from monai.networks.nets import UNet, AttentionUnet
+from monai.networks.nets import AttentionUnet, UNet, BasicUNetPlusPlus, VNet
 from monai.networks.layers import Norm
 from monai.metrics import (
     DiceMetric,
@@ -30,6 +30,7 @@ from monai.metrics import (
 from monai.data import Dataset, DataLoader, decollate_batch, list_data_collate
 from monai.config import print_config
 from toskipornot.models.NoSkipUnet import NoSkipUNet
+from toskipornot.models.NoSkipVnet import NoSkipVNet
 
 
 def test_robustness(root_dir, net, model_path, output_folder):
@@ -57,7 +58,7 @@ def test_robustness(root_dir, net, model_path, output_folder):
     for variation in data_variations:
         print("For data in range: ", variation)
         train_data_dir = os.path.join(
-            root_dir, "data", "foreground-processed", variation
+            root_dir, "data", "background-processed", variation
         )
         images = sorted(glob(os.path.join(train_data_dir, "train", "*")))
         masks = sorted(glob(os.path.join(train_data_dir, "mask", "*")))
@@ -92,6 +93,15 @@ def test_robustness(root_dir, net, model_path, output_folder):
                 channels=(16, 32, 64, 128, 256),
                 strides=(2, 2, 2, 2),
             ),
+            "unetplusplus_model_params": dict(
+                spatial_dims=2,
+                in_channels=1,
+                out_channels=1,
+                features=(16, 32, 64, 128, 256, 512),
+                norm=Norm.BATCH,
+                act="ReLU",
+                bias=False,
+            ),
             "unet_model_params": dict(
                 spatial_dims=2,
                 in_channels=1,
@@ -101,6 +111,14 @@ def test_robustness(root_dir, net, model_path, output_folder):
                 num_res_units=0,
                 norm=Norm.BATCH,
                 act="ReLU",
+                # bias=False,
+            ),
+            "vnet_model_params": dict(
+                spatial_dims=2,
+                in_channels=1,
+                out_channels=1,
+                act="ReLU",
+                dropout_prob=0.0,
                 # bias=False,
             ),
             "noskipunet_model_params": dict(
@@ -114,14 +132,28 @@ def test_robustness(root_dir, net, model_path, output_folder):
                 act="ReLU",
                 # bias=False,
             ),
+            "noskipvnet_model_params": dict(
+                spatial_dims=2,
+                in_channels=1,
+                out_channels=1,
+                act="ReLU",
+                dropout_prob=0.0,
+                # bias=False,
+            ),
         }
 
         if net == "AttentionUNet":
-            model = AttentionUnet(**config["att_model_params"]).to(device)
+            model = AttentionUnet(**config["att_model_params"])
         elif net == "NoSkipUNet":
-            model = NoSkipUNet(**config["noskipunet_model_params"]).to(device)
+            model = NoSkipUNet(**config["noskipunet_model_params"])
+        elif net == "NoSkipVNet":
+            model = NoSkipVNet(**config["noskipvnet_model_params"])
         elif net == "unet":
-            model = UNet(**config["unet_model_params"]).to(device)
+            model = UNet(**config["unet_model_params"])
+        elif net == "UNet++":
+            model = BasicUNetPlusPlus(**config["unetplusplus_model_params"])
+        elif net == "vnet":
+            model = VNet(**config["vnet_model_params"])
         model.load_state_dict(
             torch.load(
                 os.path.join(model_path, "best_metric_model_segmentation2d_dict.pth")
@@ -179,6 +211,8 @@ def test_robustness(root_dir, net, model_path, output_folder):
                     "label"
                 ].to(device)
                 test_outputs = model(test_images)
+                if type(test_outputs) is list:
+                    test_outputs = test_outputs[0]
                 test_outputs = [post_trans(i) for i in decollate_batch(test_outputs)]
                 test_labels = decollate_batch(test_labels)
                 # compute metric for current iteration
@@ -219,9 +253,16 @@ def test_robustness(root_dir, net, model_path, output_folder):
 if __name__ == "__main__":
     print_config()
     root_dir = "/Users/amithkamath/repo/to_skip_or_not/"
-    model_path = os.path.join(root_dir, "models/synthetic-foreground-experiments/")
+    model_path = os.path.join(root_dir, "models/background-experiments-oneseed/")
 
-    for net in ["AttentionUNet", "unet", "NoSkipUNet"]:
+    for net in [
+        "UNet++",
+        "vnet",
+        "NoSkipVNet",
+        # "unet",
+        # "NoSkipUNet",
+        # "AttentionUNet",
+    ]:
         dice_for_model = {}
         hd_for_model = {}
         sdsc_for_model = {}
@@ -232,7 +273,7 @@ if __name__ == "__main__":
             output_path = os.path.join(
                 root_dir,
                 "reports",
-                "foreground-robustness_results",
+                "background_robustness",
                 net,
                 train_model_name,
             )
