@@ -1,0 +1,645 @@
+For Dice in data: Breast 
+ (Ultrasound) and texture level: Hardest
+                      0
+NoSkipVNet     0.469388
+VNet           0.272109
+NoSkipUNet     0.108844
+AttentionUNet  0.088435
+UNet           0.047619
+UNet++         0.013605
+For Dice in data: Breast 
+ (Ultrasound) and texture level: Harder
+                      0
+NoSkipVNet     0.265306
+NoSkipUNet     0.265306
+UNet           0.210884
+VNet           0.129252
+AttentionUNet  0.108844
+UNet++         0.020408
+For Dice in data: Breast 
+ (Ultrasound) and texture level: Unperturbed
+                      0
+NoSkipUNet     0.251701
+UNet           0.224490
+AttentionUNet  0.210884
+UNet++         0.156463
+VNet           0.081633
+NoSkipVNet     0.074830
+For Dice in data: Breast 
+ (Ultrasound) and texture level: Easier
+                      0
+AttentionUNet  0.346939
+NoSkipUNet     0.238095
+UNet           0.122449
+UNet++         0.115646
+NoSkipVNet     0.108844
+VNet           0.068027
+For Dice in data: Breast 
+ (Ultrasound) and texture level: Easiest
+                      0
+AttentionUNet  0.340136
+NoSkipUNet     0.190476
+UNet++         0.176871
+UNet           0.149660
+VNet           0.081633
+NoSkipVNet     0.061224
+For Dice in data: Colon 
+ (Histology) and texture level: Hardest
+                    0
+VNet           0.3250
+AttentionUNet  0.2875
+NoSkipVNet     0.2000
+UNet++         0.1125
+UNet           0.0500
+NoSkipUNet     0.0250
+For Dice in data: Colon 
+ (Histology) and texture level: Harder
+                    0
+AttentionUNet  0.3250
+NoSkipVNet     0.2875
+VNet           0.1250
+UNet++         0.1125
+NoSkipUNet     0.1125
+UNet           0.0375
+For Dice in data: Colon 
+ (Histology) and texture level: Unperturbed
+                    0
+UNet++         0.2750
+NoSkipVNet     0.2625
+AttentionUNet  0.2375
+UNet           0.1125
+VNet           0.0625
+NoSkipUNet     0.0500
+For Dice in data: Colon 
+ (Histology) and texture level: Easier
+                    0
+AttentionUNet  0.3625
+UNet++         0.3500
+VNet           0.1250
+NoSkipUNet     0.0875
+UNet           0.0500
+NoSkipVNet     0.0250
+For Dice in data: Colon 
+ (Histology) and texture level: Easiest
+                    0
+VNet           0.3000
+UNet++         0.2875
+AttentionUNet  0.2625
+UNet           0.0875
+NoSkipUNet     0.0625
+For Dice in data: Heart 
+ (MRI) and texture level: Hardest
+                   0
+NoSkipVNet  0.783333
+VNet        0.133333
+NoSkipUNet  0.083333
+For Dice in data: Heart 
+ (MRI) and texture level: Harder
+                   0
+VNet        0.616667
+NoSkipVNet  0.266667
+NoSkipUNet  0.116667
+For Dice in data: Heart 
+ (MRI) and texture level: Unperturbed
+                      0
+AttentionUNet  0.383333
+VNet           0.316667
+UNet++         0.208333
+UNet           0.075000
+NoSkipVNet     0.008333
+NoSkipUNet     0.008333
+For Dice in data: Heart 
+ (MRI) and texture level: Easier
+                      0
+AttentionUNet  0.491667
+VNet           0.400000
+NoSkipVNet     0.091667
+NoSkipUNet     0.008333
+UNet           0.008333
+For Dice in data: Heart 
+ (MRI) and texture level: Easiest
+                      0
+AttentionUNet  0.425000
+VNet           0.366667
+NoSkipVNet     0.141667
+NoSkipUNet     0.066667
+For Dice in data: Spleen 
+ (CT) and texture level: Hardest
+                      0
+NoSkipUNet     0.731481
+NoSkipVNet     0.226852
+AttentionUNet  0.041667
+For Dice in data: Spleen 
+ (CT) and texture level: Harder
+                      0
+NoSkipUNet     0.750000
+NoSkipVNet     0.171296
+AttentionUNet  0.078704
+For Dice in data: Spleen 
+ (CT) and texture level: Unperturbed
+                      0
+VNet           0.384259
+UNet++         0.314815
+AttentionUNet  0.296296
+UNet           0.004630
+For Dice in data: Spleen 
+ (CT) and texture level: Easier
+                      0
+AttentionUNet  0.421296
+NoSkipUNet     0.416667
+NoSkipVNet     0.097222
+VNet           0.041667
+UNet           0.018519
+UNet++         0.004630
+For Dice in data: Spleen 
+ (CT) and texture level: Easiest
+                      0
+NoSkipVNet     0.629630
+NoSkipUNet     0.273148
+AttentionUNet  0.069444
+UNet++         0.013889
+UNet           0.013889
+For HD in data: Breast 
+ (Ultrasound) and texture level: Hardest
+                      0
+NoSkipVNet     0.496599
+VNet           0.244898
+NoSkipUNet     0.115646
+AttentionUNet  0.088435
+UNet           0.047619
+UNet++         0.006803
+For HD in data: Breast 
+ (Ultrasound) and texture level: Harder
+                      0
+NoSkipVNet     0.319728
+NoSkipUNet     0.272109
+VNet           0.190476
+AttentionUNet  0.108844
+UNet           0.095238
+UNet++         0.013605
+For HD in data: Breast 
+ (Ultrasound) and texture level: Unperturbed
+                      0
+AttentionUNet  0.292517
+NoSkipUNet     0.217687
+NoSkipVNet     0.142857
+UNet           0.129252
+UNet++         0.108844
+VNet           0.108844
+For HD in data: Breast 
+ (Ultrasound) and texture level: Easier
+                      0
+AttentionUNet  0.421769
+NoSkipVNet     0.210884
+NoSkipUNet     0.156463
+UNet++         0.102041
+VNet           0.061224
+UNet           0.047619
+For HD in data: Breast 
+ (Ultrasound) and texture level: Easiest
+                      0
+AttentionUNet  0.387755
+UNet++         0.197279
+NoSkipUNet     0.136054
+NoSkipVNet     0.095238
+VNet           0.095238
+UNet           0.088435
+For HD in data: Colon 
+ (Histology) and texture level: Hardest
+                    0
+AttentionUNet  0.5375
+NoSkipVNet     0.1875
+UNet++         0.1250
+VNet           0.1000
+UNet           0.0375
+NoSkipUNet     0.0125
+For HD in data: Colon 
+ (Histology) and texture level: Harder
+                    0
+AttentionUNet  0.2750
+NoSkipVNet     0.2750
+UNet++         0.2000
+VNet           0.1625
+NoSkipUNet     0.0500
+UNet           0.0375
+For HD in data: Colon 
+ (Histology) and texture level: Unperturbed
+                    0
+UNet++         0.2250
+NoSkipVNet     0.2250
+NoSkipUNet     0.1750
+UNet           0.1625
+AttentionUNet  0.1125
+VNet           0.1000
+For HD in data: Colon 
+ (Histology) and texture level: Easier
+                    0
+UNet++         0.3625
+AttentionUNet  0.2625
+NoSkipVNet     0.1375
+NoSkipUNet     0.0875
+VNet           0.0750
+UNet           0.0750
+For HD in data: Colon 
+ (Histology) and texture level: Easiest
+                    0
+AttentionUNet  0.3375
+UNet++         0.2750
+NoSkipUNet     0.1625
+UNet           0.1000
+VNet           0.0875
+NoSkipVNet     0.0375
+For HD in data: Heart 
+ (MRI) and texture level: Hardest
+                   0
+NoSkipVNet  0.791667
+NoSkipUNet  0.133333
+VNet        0.075000
+For HD in data: Heart 
+ (MRI) and texture level: Harder
+                   0
+NoSkipVNet  0.483333
+VNet        0.375000
+NoSkipUNet  0.141667
+For HD in data: Heart 
+ (MRI) and texture level: Unperturbed
+                      0
+AttentionUNet  0.308333
+VNet           0.308333
+UNet++         0.141667
+UNet           0.108333
+NoSkipVNet     0.091667
+NoSkipUNet     0.041667
+For HD in data: Heart 
+ (MRI) and texture level: Easier
+                      0
+AttentionUNet  0.325000
+VNet           0.291667
+NoSkipVNet     0.241667
+NoSkipUNet     0.100000
+UNet           0.041667
+For HD in data: Heart 
+ (MRI) and texture level: Easiest
+                      0
+NoSkipVNet     0.475000
+VNet           0.241667
+NoSkipUNet     0.133333
+AttentionUNet  0.116667
+UNet           0.033333
+For HD in data: Spleen 
+ (CT) and texture level: Hardest
+                      0
+NoSkipUNet     0.824074
+AttentionUNet  0.152778
+NoSkipVNet     0.018519
+UNet           0.004630
+For HD in data: Spleen 
+ (CT) and texture level: Harder
+                      0
+NoSkipUNet     0.708333
+NoSkipVNet     0.212963
+AttentionUNet  0.064815
+VNet           0.013889
+For HD in data: Spleen 
+ (CT) and texture level: Unperturbed
+                      0
+VNet           0.467593
+AttentionUNet  0.324074
+UNet++         0.175926
+NoSkipUNet     0.013889
+UNet           0.013889
+NoSkipVNet     0.004630
+For HD in data: Spleen 
+ (CT) and texture level: Easier
+                      0
+AttentionUNet  0.587963
+NoSkipUNet     0.199074
+UNet           0.092593
+NoSkipVNet     0.069444
+VNet           0.046296
+UNet++         0.004630
+For HD in data: Spleen 
+ (CT) and texture level: Easiest
+                      0
+AttentionUNet  0.643519
+NoSkipUNet     0.254630
+UNet           0.092593
+UNet++         0.004630
+NoSkipVNet     0.004630
+For SurfaceDSC in data: Breast 
+ (Ultrasound) and texture level: Hardest
+                      0
+NoSkipVNet     0.394558
+VNet           0.360544
+AttentionUNet  0.102041
+NoSkipUNet     0.074830
+UNet           0.061224
+UNet++         0.006803
+For SurfaceDSC in data: Breast 
+ (Ultrasound) and texture level: Harder
+                      0
+NoSkipUNet     0.265306
+VNet           0.224490
+UNet           0.197279
+NoSkipVNet     0.190476
+AttentionUNet  0.108844
+UNet++         0.013605
+For SurfaceDSC in data: Breast 
+ (Ultrasound) and texture level: Unperturbed
+                      0
+UNet++         0.272109
+AttentionUNet  0.265306
+NoSkipUNet     0.176871
+UNet           0.115646
+VNet           0.108844
+NoSkipVNet     0.061224
+For SurfaceDSC in data: Breast 
+ (Ultrasound) and texture level: Easier
+                      0
+AttentionUNet  0.387755
+UNet++         0.183673
+NoSkipUNet     0.142857
+NoSkipVNet     0.102041
+VNet           0.095238
+UNet           0.088435
+For SurfaceDSC in data: Breast 
+ (Ultrasound) and texture level: Easiest
+                      0
+AttentionUNet  0.367347
+UNet++         0.265306
+NoSkipUNet     0.136054
+NoSkipVNet     0.095238
+UNet           0.081633
+VNet           0.054422
+For SurfaceDSC in data: Colon 
+ (Histology) and texture level: Hardest
+                    0
+VNet           0.4125
+NoSkipVNet     0.2125
+AttentionUNet  0.1375
+NoSkipUNet     0.1125
+UNet++         0.1000
+UNet           0.0250
+For SurfaceDSC in data: Colon 
+ (Histology) and texture level: Harder
+                    0
+NoSkipVNet     0.3375
+VNet           0.3000
+NoSkipUNet     0.1500
+AttentionUNet  0.1000
+UNet           0.0750
+UNet++         0.0375
+For SurfaceDSC in data: Colon 
+ (Histology) and texture level: Unperturbed
+                    0
+NoSkipVNet     0.3000
+UNet++         0.3000
+VNet           0.2000
+AttentionUNet  0.1375
+UNet           0.0375
+NoSkipUNet     0.0250
+For SurfaceDSC in data: Colon 
+ (Histology) and texture level: Easier
+                    0
+UNet++         0.3625
+VNet           0.2375
+AttentionUNet  0.2125
+NoSkipVNet     0.1500
+NoSkipUNet     0.0375
+For SurfaceDSC in data: Colon 
+ (Histology) and texture level: Easiest
+                    0
+VNet           0.4625
+UNet++         0.2625
+AttentionUNet  0.2375
+NoSkipVNet     0.0375
+For SurfaceDSC in data: Heart 
+ (MRI) and texture level: Hardest
+                0
+NoSkipVNet  0.650
+NoSkipUNet  0.275
+VNet        0.075
+For SurfaceDSC in data: Heart 
+ (MRI) and texture level: Harder
+                0
+VNet        0.550
+NoSkipVNet  0.275
+NoSkipUNet  0.175
+For SurfaceDSC in data: Heart 
+ (MRI) and texture level: Unperturbed
+                      0
+UNet++         0.533333
+AttentionUNet  0.283333
+UNet           0.100000
+VNet           0.050000
+NoSkipVNet     0.033333
+For SurfaceDSC in data: Heart 
+ (MRI) and texture level: Easier
+                      0
+AttentionUNet  0.441667
+VNet           0.341667
+NoSkipVNet     0.141667
+NoSkipUNet     0.050000
+UNet           0.025000
+For SurfaceDSC in data: Heart 
+ (MRI) and texture level: Easiest
+                      0
+NoSkipVNet     0.316667
+VNet           0.308333
+AttentionUNet  0.258333
+NoSkipUNet     0.108333
+UNet           0.008333
+For SurfaceDSC in data: Spleen 
+ (CT) and texture level: Hardest
+                      0
+NoSkipUNet     0.736111
+NoSkipVNet     0.180556
+AttentionUNet  0.083333
+For SurfaceDSC in data: Spleen 
+ (CT) and texture level: Harder
+                      0
+NoSkipUNet     0.759259
+NoSkipVNet     0.138889
+AttentionUNet  0.101852
+For SurfaceDSC in data: Spleen 
+ (CT) and texture level: Unperturbed
+                      0
+UNet++         0.356481
+AttentionUNet  0.319444
+VNet           0.287037
+UNet           0.037037
+For SurfaceDSC in data: Spleen 
+ (CT) and texture level: Easier
+                      0
+AttentionUNet  0.444444
+NoSkipUNet     0.407407
+NoSkipVNet     0.055556
+UNet           0.046296
+VNet           0.037037
+UNet++         0.009259
+For SurfaceDSC in data: Spleen 
+ (CT) and texture level: Easiest
+                      0
+NoSkipUNet     0.384259
+NoSkipVNet     0.305556
+AttentionUNet  0.282407
+UNet++         0.013889
+UNet           0.013889
+For SurfaceDistance in data: Breast 
+ (Ultrasound) and texture level: Hardest
+                      0
+NoSkipVNet     0.448980
+VNet           0.258503
+NoSkipUNet     0.122449
+AttentionUNet  0.095238
+UNet           0.074830
+For SurfaceDistance in data: Breast 
+ (Ultrasound) and texture level: Harder
+                      0
+NoSkipUNet     0.265306
+NoSkipVNet     0.251701
+UNet           0.197279
+VNet           0.170068
+AttentionUNet  0.115646
+For SurfaceDistance in data: Breast 
+ (Ultrasound) and texture level: Unperturbed
+                      0
+AttentionUNet  0.285714
+NoSkipUNet     0.224490
+UNet           0.163265
+UNet++         0.149660
+VNet           0.102041
+NoSkipVNet     0.074830
+For SurfaceDistance in data: Breast 
+ (Ultrasound) and texture level: Easier
+                      0
+AttentionUNet  0.469388
+NoSkipUNet     0.176871
+NoSkipVNet     0.149660
+UNet++         0.088435
+VNet           0.068027
+UNet           0.047619
+For SurfaceDistance in data: Breast 
+ (Ultrasound) and texture level: Easiest
+                      0
+AttentionUNet  0.428571
+UNet++         0.163265
+NoSkipUNet     0.149660
+UNet           0.115646
+NoSkipVNet     0.081633
+VNet           0.061224
+For SurfaceDistance in data: Colon 
+ (Histology) and texture level: Hardest
+                    0
+AttentionUNet  0.3500
+NoSkipVNet     0.3250
+VNet           0.2375
+UNet++         0.0750
+NoSkipUNet     0.0125
+For SurfaceDistance in data: Colon 
+ (Histology) and texture level: Harder
+                    0
+NoSkipVNet     0.4125
+AttentionUNet  0.2500
+UNet++         0.1625
+VNet           0.0875
+NoSkipUNet     0.0750
+UNet           0.0125
+For SurfaceDistance in data: Colon 
+ (Histology) and texture level: Unperturbed
+                    0
+NoSkipVNet     0.3125
+UNet++         0.2625
+AttentionUNet  0.2375
+NoSkipUNet     0.0750
+UNet           0.0625
+VNet           0.0500
+For SurfaceDistance in data: Colon 
+ (Histology) and texture level: Easier
+                   0
+UNet++         0.475
+AttentionUNet  0.200
+NoSkipVNet     0.125
+NoSkipUNet     0.100
+VNet           0.050
+UNet           0.050
+For SurfaceDistance in data: Colon 
+ (Histology) and texture level: Easiest
+                    0
+AttentionUNet  0.2875
+UNet++         0.2750
+VNet           0.1750
+NoSkipUNet     0.1500
+UNet           0.0875
+NoSkipVNet     0.0250
+For SurfaceDistance in data: Heart 
+ (MRI) and texture level: Hardest
+               0
+NoSkipVNet  0.80
+VNet        0.15
+NoSkipUNet  0.05
+For SurfaceDistance in data: Heart 
+ (MRI) and texture level: Harder
+                   0
+VNet        0.691667
+NoSkipVNet  0.258333
+NoSkipUNet  0.050000
+For SurfaceDistance in data: Heart 
+ (MRI) and texture level: Unperturbed
+                      0
+AttentionUNet  0.341667
+VNet           0.325000
+UNet++         0.191667
+UNet           0.100000
+NoSkipVNet     0.041667
+For SurfaceDistance in data: Heart 
+ (MRI) and texture level: Easier
+                      0
+AttentionUNet  0.475000
+VNet           0.408333
+NoSkipVNet     0.083333
+UNet           0.025000
+NoSkipUNet     0.008333
+For SurfaceDistance in data: Heart 
+ (MRI) and texture level: Easiest
+                      0
+AttentionUNet  0.408333
+VNet           0.358333
+NoSkipVNet     0.183333
+NoSkipUNet     0.050000
+For SurfaceDistance in data: Spleen 
+ (CT) and texture level: Hardest
+                      0
+NoSkipUNet     0.796296
+AttentionUNet  0.185185
+NoSkipVNet     0.018519
+For SurfaceDistance in data: Spleen 
+ (CT) and texture level: Harder
+                      0
+NoSkipUNet     0.754630
+NoSkipVNet     0.162037
+AttentionUNet  0.074074
+VNet           0.009259
+For SurfaceDistance in data: Spleen 
+ (CT) and texture level: Unperturbed
+                      0
+VNet           0.421296
+AttentionUNet  0.310185
+UNet++         0.254630
+UNet           0.009259
+NoSkipUNet     0.004630
+For SurfaceDistance in data: Spleen 
+ (CT) and texture level: Easier
+                      0
+AttentionUNet  0.583333
+NoSkipUNet     0.273148
+UNet           0.060185
+VNet           0.041667
+NoSkipVNet     0.041667
+For SurfaceDistance in data: Spleen 
+ (CT) and texture level: Easiest
+                      0
+AttentionUNet  0.740741
+NoSkipUNet     0.194444
+UNet           0.060185
+NoSkipVNet     0.004630
