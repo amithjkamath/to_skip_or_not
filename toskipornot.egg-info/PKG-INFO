@@ -1,7 +1,0 @@
-Metadata-Version: 2.1
-Name: toskipornot
-Version: 0.2.0
-Summary: This is a set of experiments to investigate how image texture interacts with UNet architecture choices.
-Author: Amith Kamath
-License: MIT
-License-File: LICENSE
