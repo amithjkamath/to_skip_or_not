@@ -75,7 +75,6 @@ class NoSkipUNet(UNet):
         dropout: float = 0.0,
         bias: bool = True,
         adn_ordering: str = "NDA",
-        dimensions: Optional[int] = None,
     ) -> None:
 
         super().__init__(
@@ -92,7 +91,6 @@ class NoSkipUNet(UNet):
             dropout,
             bias,
             adn_ordering,
-            dimensions,
         )
 
         def _create_block(
