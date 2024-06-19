@@ -16,8 +16,8 @@ from monai.transforms import (
     EnsureType,
 )
 from monai.networks.nets import UNet, VNet, BasicUNetPlusPlus, AttentionUnet
-from NoSkipUnet import NoSkipUNet
-from NoSkipVnet import NoSkipVNet
+from toskipornot.models.NoSkipVnet import NoSkipVNet
+from toskipornot.models.NoSkipUnet import NoSkipUNet
 from monai.networks.layers import Norm
 from monai.metrics import DiceMetric
 from monai.losses import DiceLoss
@@ -26,7 +26,6 @@ from monai.data import CacheDataset, list_data_collate, decollate_batch, DataLoa
 from monai.config import print_config
 
 import torch
-import matplotlib.pyplot as plt
 
 import os
 import glob
@@ -34,7 +33,7 @@ from datetime import datetime
 
 
 PATCH_SIZE = 128
-DEVICE = "cuda" #"cpu"
+DEVICE = "cpu" #"cuda"
 
 class Net(pytorch_lightning.LightningModule):
     def __init__(self, data_dir):
@@ -284,7 +283,7 @@ def main():
 
     eventid = datetime.now().strftime('-%Y%m-%d%H-%M%S')
 
-    root_dir = "/home/akamath/data/MSD"
+    root_dir = "/Users/amithkamath/data/MSD"
     print(root_dir)
 
     data_dir = os.path.join(root_dir, "Task09_Spleen")

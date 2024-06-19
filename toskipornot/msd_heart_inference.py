@@ -17,7 +17,7 @@ from monai.transforms import (
     CropForegroundd,
     LoadImaged,
     Orientationd,
-    ScaleIntensityRanged,
+    ScaleIntensityd,
     Spacingd,
     EnsureType,
     RandGaussianNoised,
@@ -30,15 +30,15 @@ from monai.utils import set_determinism
 from toskipornot.models.NoSkipUnet import NoSkipUNet
 from toskipornot.models.NoSkipVnet import NoSkipVNet
 
-PATCH_SIZE = 128
-DEVICE = "cpu" #"cuda"
+
+PATCH_SIZE = 96
+DEVICE = "cuda" #"cpu"
 
 
 class Net(pytorch_lightning.LightningModule):
     def __init__(self):
         super().__init__()
-
-
+        """
         self._model = UNet(
             spatial_dims=3,
             in_channels=1,
@@ -49,16 +49,6 @@ class Net(pytorch_lightning.LightningModule):
             norm=Norm.BATCH,
             act="ReLU",
             bias=False,
-        )
-
-        """
-        self._model = VNet(
-            spatial_dims=3,
-            in_channels=1,
-            out_channels=2,
-            act="ReLU",
-            dropout_prob_down=0.0,
-            dropout_prob_up=(0.0, 0.0),
         )
         """
         """
@@ -75,6 +65,16 @@ class Net(pytorch_lightning.LightningModule):
         )
         """
         """
+        self._model = VNet(
+            spatial_dims=3,
+            in_channels=1,
+            out_channels=2,
+            act="ReLU",
+            dropout_prob_down=0.0,
+            dropout_prob_up=(0.0, 0.0),
+        )
+        """
+
         self._model = NoSkipVNet(
             spatial_dims=3,
             in_channels=1,
@@ -82,7 +82,7 @@ class Net(pytorch_lightning.LightningModule):
             act="ReLU",
             dropout_prob=0.0,
         )
-        """
+
         """
         self._model = AttentionUnet(
             spatial_dims=3,
@@ -137,7 +137,7 @@ def inference(saved_path, data_root):
         {"image": image_name, "label": label_name} for image_name, label_name in zip(images, labels)
     ]
     # For Spleen:
-    test_files = data_dicts[34:]
+    test_files = data_dicts[15:]
 
     # set deterministic training for reproducibility
     set_determinism(seed=0)
@@ -149,21 +149,14 @@ def inference(saved_path, data_root):
             Orientationd(keys=["image", "label"], axcodes="RAS"),
             Spacingd(
                 keys=["image", "label"],
-                pixdim=(1.5, 1.5, 2.0),
+                pixdim=(2.0, 2.0, 2.0),
                 mode=("bilinear", "nearest"),
             ),
-            ScaleIntensityRanged(
+            ScaleIntensityd(
                 keys=["image"],
-                a_min=-57,
-                a_max=164,
-                b_min=0.0,
-                b_max=1.0,
-                clip=True,
+                minv=0.0,
+                maxv=1.0,
             ),
-            #RandGaussianNoised(keys=["image"], prob=1.0, mean=0.0, std=0.5, allow_missing_keys=False, sample_std=True),
-            #RandGaussianSmoothd(keys=["image"], prob=1.0, sigma_x=(0.1, 0.1), sigma_y=(0.1, 0.1), sigma_z=(0.1, 0.1), allow_missing_keys=False),
-            #RandRicianNoised(keys=["image"], prob=1.0, mean=0.0, std=0.1),
-            RandCoarseDropoutd(keys=["image"], prob=1, holes=256, spatial_size=3, fill_value=0),
             CropForegroundd(keys=["image", "label"], source_key="image"),
         ]
     )
@@ -191,26 +184,13 @@ def inference(saved_path, data_root):
                              }
     results_df = pd.DataFrame.from_dict(results_dict)
 
-    save_file_name = os.path.join(os.path.split(saved_path)[:-1][0], "test_randcoarsedropout_256.csv")
+    save_file_name = os.path.join(os.path.split(saved_path)[:-1][0], "test_original.csv")
     results_df.transpose().to_csv(save_file_name)
     print(results_df.transpose())
 
 
 if __name__ == "__main__":
-    data_root = "/Users/amithkamath/data/MSD/Task09_Spleen"
-    saved_path = "/Users/amithkamath/repo/to_skip_or_not/reports/3d-results/logs-202406-1814-5400-unet-spleen/model-epoch=321-val_loss=0.0331-val_dice=0.9359.ckpt"
-    # saved_path = "/Users/amithkamath/repo/to_skip_or_not/reports/3d-results/logs-202406-1114-5907-noskipunet-spleen/model-epoch=390-val_loss=0.08-val_dice=0.85.ckpt"
-    # LBP for 2.5 - run it per slice and average.
-    # Compare to 2D results - we expect 3D to be better.
 
-    # Run these transforms in the image input to simulate noise.
-
-    # https://docs.monai.io/en/stable/transforms.html#gibbsnoised
-    # https://docs.monai.io/en/stable/transforms.html#randcoarsedropoutd
-    # https://docs.monai.io/en/stable/transforms.html#randriciannoised
-    # https://docs.monai.io/en/stable/transforms.html#randgaussiannoised
-    # https://docs.monai.io/en/stable/transforms.html#randgaussiansmoothd
-    # https://docs.monai.io/en/stable/transforms.html#kspacespikenoised
-    # https://docs.monai.io/en/stable/transforms.html#randkspacespikenoised
-
+    saved_path = "/home/akamath/Documents/to_skip_or_not/logs-202406-1800-3511-noskipvnet-heart/model-epoch=487-val_loss=0.1154-val_dice=0.8300.ckpt"
+    data_root = "/home/akamath/data/MSD/Task02_Heart"
     inference(saved_path, data_root)
