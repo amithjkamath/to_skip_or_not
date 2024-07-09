@@ -38,7 +38,7 @@ DEVICE = "cuda" #"cpu"
 class Net(pytorch_lightning.LightningModule):
     def __init__(self):
         super().__init__()
-        """
+
         self._model = UNet(
             spatial_dims=3,
             in_channels=1,
@@ -50,7 +50,7 @@ class Net(pytorch_lightning.LightningModule):
             act="ReLU",
             bias=False,
         )
-        """
+
         """
         self._model = NoSkipUNet(
             spatial_dims=3,
@@ -74,7 +74,7 @@ class Net(pytorch_lightning.LightningModule):
             dropout_prob_up=(0.0, 0.0),
         )
         """
-
+        """
         self._model = NoSkipVNet(
             spatial_dims=3,
             in_channels=1,
@@ -82,7 +82,7 @@ class Net(pytorch_lightning.LightningModule):
             act="ReLU",
             dropout_prob=0.0,
         )
-
+        """
         """
         self._model = AttentionUnet(
             spatial_dims=3,
@@ -157,6 +157,7 @@ def inference(saved_path, data_root):
                 minv=0.0,
                 maxv=1.0,
             ),
+            RandGaussianNoised(keys=["image"], prob=1.0, mean=0.0, std=0.5, allow_missing_keys=False, sample_std=True),
             CropForegroundd(keys=["image", "label"], source_key="image"),
         ]
     )
@@ -184,13 +185,13 @@ def inference(saved_path, data_root):
                              }
     results_df = pd.DataFrame.from_dict(results_dict)
 
-    save_file_name = os.path.join(os.path.split(saved_path)[:-1][0], "test_original.csv")
+    save_file_name = os.path.join(os.path.split(saved_path)[:-1][0], "test_randgaussiannoise_0p5.csv")
     results_df.transpose().to_csv(save_file_name)
     print(results_df.transpose())
 
 
 if __name__ == "__main__":
 
-    saved_path = "/home/akamath/Documents/to_skip_or_not/logs-202406-1800-3511-noskipvnet-heart/model-epoch=487-val_loss=0.1154-val_dice=0.8300.ckpt"
+    saved_path = "/home/akamath/Documents/to_skip_or_not/logs-202406-1713-5208-unet-heart/model-epoch=449-val_loss=0.0484-val_dice=0.9056.ckpt"
     data_root = "/home/akamath/data/MSD/Task02_Heart"
     inference(saved_path, data_root)
