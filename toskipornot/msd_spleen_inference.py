@@ -37,8 +37,6 @@ DEVICE = "cpu" #"cuda"
 class Net(pytorch_lightning.LightningModule):
     def __init__(self):
         super().__init__()
-
-
         self._model = UNet(
             spatial_dims=3,
             in_channels=1,
@@ -50,7 +48,6 @@ class Net(pytorch_lightning.LightningModule):
             act="ReLU",
             bias=False,
         )
-
         """
         self._model = VNet(
             spatial_dims=3,
@@ -174,8 +171,8 @@ def inference(saved_path, data_root):
             ),
             #RandGaussianNoised(keys=["image"], prob=1.0, mean=0.0, std=0.5, allow_missing_keys=False, sample_std=True),
             #RandGaussianSmoothd(keys=["image"], prob=1.0, sigma_x=(0.1, 0.1), sigma_y=(0.1, 0.1), sigma_z=(0.1, 0.1), allow_missing_keys=False),
-            #RandRicianNoised(keys=["image"], prob=1.0, mean=0.0, std=0.1),
-            RandCoarseDropoutd(keys=["image"], prob=1, holes=256, spatial_size=3, fill_value=0),
+            #RandRicianNoised(keys=["image"], prob=1.0, mean=0.0, std=0.9),
+            #RandCoarseDropoutd(keys=["image"], prob=1, holes=256, spatial_size=3, fill_value=0),
             CropForegroundd(keys=["image", "label"], source_key="image"),
         ]
     )
@@ -203,15 +200,15 @@ def inference(saved_path, data_root):
                              }
     results_df = pd.DataFrame.from_dict(results_dict)
 
-    save_file_name = os.path.join(os.path.split(saved_path)[:-1][0], "test_randcoarsedropout_256.csv")
+    save_file_name = os.path.join(os.path.split(saved_path)[:-1][0], "test_randriciannoise_0p9.csv")
     results_df.transpose().to_csv(save_file_name)
     print(results_df.transpose())
 
 
 if __name__ == "__main__":
     data_root = "/Users/amithkamath/data/MSD/Task09_Spleen"
-    saved_path = "/Users/amithkamath/repo/to_skip_or_not/reports/3d-results/logs-202406-1814-5400-unet-spleen/model-epoch=321-val_loss=0.0331-val_dice=0.9359.ckpt"
-    # saved_path = "/Users/amithkamath/repo/to_skip_or_not/reports/3d-results/logs-202406-1114-5907-noskipunet-spleen/model-epoch=390-val_loss=0.08-val_dice=0.85.ckpt"
+    saved_path = "/Users/amithkamath/repo/to_skip_or_not/reports/3d-results/logs-202406-1814-5400-unet-spleen/model-epoch=299-val_loss=0.0323-val_dice=0.9377.ckpt"
+
     # LBP for 2.5 - run it per slice and average.
     # Compare to 2D results - we expect 3D to be better.
     inference(saved_path, data_root)
