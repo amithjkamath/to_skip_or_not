@@ -32,7 +32,7 @@ from toskipornot.models.NoSkipVnet import NoSkipVNet
 
 
 PATCH_SIZE = 96
-DEVICE = "cuda" #"cpu"
+DEVICE = "cpu" #"cuda"
 
 
 class Net(pytorch_lightning.LightningModule):
@@ -137,7 +137,7 @@ def inference(saved_path, data_root):
         {"image": image_name, "label": label_name} for image_name, label_name in zip(images, labels)
     ]
     # For Spleen:
-    test_files = data_dicts[15:]
+    test_files = data_dicts[17:]
 
     # set deterministic training for reproducibility
     set_determinism(seed=0)
@@ -157,7 +157,10 @@ def inference(saved_path, data_root):
                 minv=0.0,
                 maxv=1.0,
             ),
-            RandGaussianNoised(keys=["image"], prob=1.0, mean=0.0, std=0.5, allow_missing_keys=False, sample_std=True),
+            #RandGaussianNoised(keys=["image"], prob=1.0, mean=0.0, std=0.1, allow_missing_keys=False, sample_std=True),
+            #RandGaussianSmoothd(keys=["image"], prob=1.0, sigma_x=(0.5, 0.5), sigma_y=(0.5, 0.5), sigma_z=(0.5, 0.5), allow_missing_keys=False),
+            # RandRicianNoised(keys=["image"], prob=1.0, mean=0.0, std=0.9),
+            RandCoarseDropoutd(keys=["image"], prob=1, holes=256, spatial_size=3, fill_value=0),
             CropForegroundd(keys=["image", "label"], source_key="image"),
         ]
     )
@@ -185,13 +188,13 @@ def inference(saved_path, data_root):
                              }
     results_df = pd.DataFrame.from_dict(results_dict)
 
-    save_file_name = os.path.join(os.path.split(saved_path)[:-1][0], "test_randgaussiannoise_0p5.csv")
+    save_file_name = os.path.join(os.path.split(saved_path)[:-1][0], "test_randcoarsedropout_256.csv")
     results_df.transpose().to_csv(save_file_name)
     print(results_df.transpose())
 
 
 if __name__ == "__main__":
 
-    saved_path = "/home/akamath/Documents/to_skip_or_not/logs-202406-1713-5208-unet-heart/model-epoch=449-val_loss=0.0484-val_dice=0.9056.ckpt"
-    data_root = "/home/akamath/data/MSD/Task02_Heart"
+    saved_path = "/Users/amithkamath/repo/to_skip_or_not/reports/3d-results/logs-202406-1713-5208-unet-heart/model-epoch=449-val_loss=0.0484-val_dice=0.9056.ckpt"
+    data_root = "/Users/amithkamath/data/MSD/Task02_Heart"
     inference(saved_path, data_root)
