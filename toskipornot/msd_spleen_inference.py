@@ -142,6 +142,18 @@ def inference(saved_path, data_root):
     # set deterministic training for reproducibility
     set_determinism(seed=0)
 
+    # Run these transforms in the image input to simulate noise.
+    # https://docs.monai.io/en/stable/transforms.html#gibbsnoised
+    # https://docs.monai.io/en/stable/transforms.html#randcoarsedropoutd
+    # https://docs.monai.io/en/stable/transforms.html#randriciannoised
+    # https://docs.monai.io/en/stable/transforms.html#randgaussiannoised
+    # https://docs.monai.io/en/stable/transforms.html#randgaussiansmoothd
+    # https://docs.monai.io/en/stable/transforms.html#kspacespikenoised
+    # https://docs.monai.io/en/stable/transforms.html#randkspacespikenoised
+
+    # write code to filter image using opencv and then apply the transforms.
+
+
     test_transforms = Compose(
         [
             LoadImaged(keys=["image", "label"]),
@@ -202,15 +214,4 @@ if __name__ == "__main__":
     # saved_path = "/Users/amithkamath/repo/to_skip_or_not/reports/3d-results/logs-202406-1114-5907-noskipunet-spleen/model-epoch=390-val_loss=0.08-val_dice=0.85.ckpt"
     # LBP for 2.5 - run it per slice and average.
     # Compare to 2D results - we expect 3D to be better.
-
-    # Run these transforms in the image input to simulate noise.
-
-    # https://docs.monai.io/en/stable/transforms.html#gibbsnoised
-    # https://docs.monai.io/en/stable/transforms.html#randcoarsedropoutd
-    # https://docs.monai.io/en/stable/transforms.html#randriciannoised
-    # https://docs.monai.io/en/stable/transforms.html#randgaussiannoised
-    # https://docs.monai.io/en/stable/transforms.html#randgaussiansmoothd
-    # https://docs.monai.io/en/stable/transforms.html#kspacespikenoised
-    # https://docs.monai.io/en/stable/transforms.html#randkspacespikenoised
-
     inference(saved_path, data_root)
