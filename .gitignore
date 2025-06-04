@@ -1,5 +1,4 @@
-data*
-models*
+*noshare*
 logs*
 
 *__pycache__

@@ -53,7 +53,7 @@ root_dir = "../"
 
 direction = "back"  # "back" or "fore"
 metric = "dice"  # "dice" or "hd", "sdsc", "surfdist"
-report_path = os.path.join(root_dir, "reports", direction + "ground-results")
+report_path = os.path.join(root_dir, "results", direction + "ground-results")
 
 agunet_data = pd.read_csv(
     os.path.join(report_path, metric + "_for_AttentionUNet.csv"), index_col=0

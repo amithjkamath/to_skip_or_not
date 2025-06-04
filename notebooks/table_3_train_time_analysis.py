@@ -10,7 +10,7 @@ warnings.filterwarnings("ignore")
 
 def train_time_metrics():
     current_path = os.path.dirname(os.path.abspath(__file__))
-    results_path = os.path.join(current_path, "..", "reports")
+    results_path = os.path.join(current_path, "..", "results")
 
     report_path = os.path.join(results_path, "train-time-results")
 

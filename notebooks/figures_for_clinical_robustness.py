@@ -7,7 +7,7 @@ import seaborn as sns
 
 def analyze_clinical_robustness(metric_name="Dice"):
     current_path = os.path.dirname(os.path.abspath(__file__))
-    results_path = os.path.join(current_path, "..", "reports")
+    results_path = os.path.join(current_path, "..", "results")
 
     model_list = ["UNet++", "AttentionUNet", "UNet", "VNet", "NoSkipUNet", "NoSkipVNet"]
     model_alias = {
