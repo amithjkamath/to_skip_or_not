@@ -70,3 +70,15 @@ Implemented using [MONAI](https://monai.io/) and PyTorch.
 
 ```bash
 pip install -r requirements.txt
+```
+
+If this is useful in your research, please consider citing:
+
+    @inproceedings{kamath2023we,
+      title={Do we really need that skip-connection? understanding its interplay with task complexity},
+      author={Kamath, Amith and Willmann, Jonas and Andratschke, Nicolaus and Reyes, Mauricio},
+      booktitle={International Conference on Medical Image Computing and Computer-Assisted Intervention},
+      pages={302--311},
+      year={2023},
+      organization={Springer}
+    }
