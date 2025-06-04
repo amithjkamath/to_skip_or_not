@@ -9,7 +9,7 @@ by *Amith Kamath, Jonas Willmann, Nicolaus Andratschke, Mauricio Reyes*.
 🔗 [Project Website](https://amithjkamath.github.io/projects/2023-miccai-skip-connections/)  
 ---
 
-## 🧠 Overview
+## Overview
 
 This project explores the **necessity and effect of skip-connections in U-Net architectures** under varying task complexities in medical image segmentation. The study examines how the usefulness of skip-connections depends on the **textural similarity** between foreground and background, using:
 
@@ -22,16 +22,16 @@ This project explores the **necessity and effect of skip-connections in U-Net ar
 
 ---
 
-## 🔍 Key Contributions
+## Key Contributions
 
-- 🧪 **Novel robustness evaluation pipeline** using texture-based task complexity via LBP histograms
-- ⚖️ Evidence that **skip-connections may reduce robustness** in out-of-domain (OOD) scenarios
-- 💡 Finding that **attention-gated skips** help only under high-complexity conditions
-- 📉 Demonstrated **failure modes** of skip-connections where performance gains come at the cost of generalizability
+- **Novel robustness evaluation pipeline** using texture-based task complexity via LBP histograms
+- Evidence that **skip-connections may reduce robustness** in out-of-domain (OOD) scenarios
+- Finding that **attention-gated skips** help only under high-complexity conditions
+- Demonstrated **failure modes** of skip-connections where performance gains come at the cost of generalizability
 
 ---
 
-## 🏗️ Architecture Variants
+## Architecture Variants
 
 | Model        | Description                              |
 |--------------|------------------------------------------|
@@ -43,25 +43,25 @@ Implemented using [MONAI](https://monai.io/) and PyTorch.
 
 ---
 
-## 🗂️ Datasets
+## Datasets
 
 ### Synthetic
 - Texture-based foreground/background blending
 - 9 complexity levels via α ∈ {0.1, ..., 0.9}
 
 ### Medical
-- 🩺 **Breast Ultrasound**: Benign vs malignant tumors  
-- 🧠 **Spleen CT**: Organ segmentation  
-- ❤️ **Heart MRI**: Cardiac structure segmentation
+- **Breast Ultrasound**: Benign vs malignant tumors, from the [BUSI data set](https://www.sciencedirect.com/science/article/pii/S2352340919312181).
+- **Spleen CT**: binary organ segmentation from the [MSD challenge](https://www.nature.com/articles/s41467-022-30695-9).
+- **Heart MRI**: left atrium segmentation, also from the [MSD challenge](https://www.nature.com/articles/s41467-022-30695-9).
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Requirements
-- Python 3.10
+- Python 3.11.9
 - PyTorch
-- MONAI >= 1.1
+- MONAI >= 1.3
 - CUDA-enabled GPU (24GB VRAM recommended)
 
 ```bash
