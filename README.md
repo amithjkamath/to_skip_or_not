@@ -1,63 +1,68 @@
-toskipornot
-==============================
+# To Skip or Not to Skip: Investigating U-Net Skip-Connections and Task Complexity
 
-This is a set of experiments to investigate how image texture interacts with UNet architecture choices.
+![MICCAI 2023](https://img.shields.io/badge/Conference-MICCAI%202023-blue)
 
-Project Organization
-------------
+This repository accompanies the MICCAI 2023 paper:
+**"Do we really need that skip-connection? Understanding its interplay with task complexity"**  
+by *Amith Kamath, Jonas Willmann, Nicolaus Andratschke, Mauricio Reyes*.
 
-    ├── LICENSE
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
-    ├── README.md          <- The top-level README for developers using this project.
-    ├── data
-    │    ├── external      <- Data from third party sources.
-    │    ├── interim       <- Intermediate data that has been transformed.
-    │    ├── processed     <- The final, canonical data sets for modeling.
-    │    └── raw           <- The original, immutable data dump.
-    │
-    ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
-    │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
-    │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
-    │
-    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-    │
-    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │    └── figures       <- Generated graphics and figures to be used in reporting
-    │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
-    │
-    ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │    └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │    └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │    │                predictions
-    │   │    ├── predict_model.py
-    │   │    └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
-    │
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
+🔗 [Project Website](https://amithjkamath.github.io/projects/2023-miccai-skip-connections/)  
+---
 
+## 🧠 Overview
 
---------
+This project explores the **necessity and effect of skip-connections in U-Net architectures** under varying task complexities in medical image segmentation. The study examines how the usefulness of skip-connections depends on the **textural similarity** between foreground and background, using:
 
-Run the tensorboard logs in 3d-results using:
+- Controlled **synthetic texture experiments**
+- Evaluations on real **medical imaging modalities**: Ultrasound (US), CT, and MRI
+- Comparison across three U-Net variants:
+  - **Standard U-Net**
+  - **NoSkip U-Net** (no skip-connections)
+  - **AGU-Net** (Attention-Gated U-Net)
 
-    tensorboard --logdir=. 
+---
 
-from within the lightning_logs folder for each experiment.
+## 🔍 Key Contributions
 
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+- 🧪 **Novel robustness evaluation pipeline** using texture-based task complexity via LBP histograms
+- ⚖️ Evidence that **skip-connections may reduce robustness** in out-of-domain (OOD) scenarios
+- 💡 Finding that **attention-gated skips** help only under high-complexity conditions
+- 📉 Demonstrated **failure modes** of skip-connections where performance gains come at the cost of generalizability
+
+---
+
+## 🏗️ Architecture Variants
+
+| Model        | Description                              |
+|--------------|------------------------------------------|
+| `U-Net`      | Standard U-Net with identity skip-connections |
+| `NoSkipU-Net`| U-Net with all skip-connections removed  |
+| `AGU-Net`    | U-Net with attention gating on skips     |
+
+Implemented using [MONAI](https://monai.io/) and PyTorch.
+
+---
+
+## 🗂️ Datasets
+
+### Synthetic
+- Texture-based foreground/background blending
+- 9 complexity levels via α ∈ {0.1, ..., 0.9}
+
+### Medical
+- 🩺 **Breast Ultrasound**: Benign vs malignant tumors  
+- 🧠 **Spleen CT**: Organ segmentation  
+- ❤️ **Heart MRI**: Cardiac structure segmentation
+
+---
+
+## 🚀 Getting Started
+
+### Requirements
+- Python 3.10
+- PyTorch
+- MONAI >= 1.1
+- CUDA-enabled GPU (24GB VRAM recommended)
+
+```bash
+pip install -r requirements.txt

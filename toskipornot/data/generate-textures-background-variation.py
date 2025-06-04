@@ -11,17 +11,30 @@ from random import randrange
 
 
 if __name__ == "__main__":
-    root_path = "/home/akamath/Documents/toskipornot"
-    mask_path = os.path.join(root_path, "data", "raw")
-    texture_path = os.path.join(root_path, "data", "textures")
+    root_path = os.path.dirname(os.path.abspath(__file__))
+    mask_path = os.path.join(root_path, "..", "..", "data", "raw")
+    texture_path = os.path.join(root_path, "..", "..", "data", "textures")
     out_folder_name = "background-processed"
 
     # for shape in ["easiest", "easier", "normal", "harder", "hardest"]:
     for shape in ["normal"]:
         mask_path = os.path.join(mask_path, "masks_" + shape)
 
-        texture_bg_img = Image.open(os.path.join(texture_path, "'fb2dd8bc.png"))
-        texture_fg_img = Image.open(os.path.join(texture_path, "'2fbd466c.png"))
+        #a
+        #texture_bg_img = Image.open(os.path.join(texture_path, "'fb2dd8bc.png"))
+        #texture_fg_img = Image.open(os.path.join(texture_path, "'2fbd466c.png"))
+
+        #b
+        #texture_bg_img = Image.open(os.path.join(texture_path, "'4baf1c18.png"))
+        #texture_fg_img = Image.open(os.path.join(texture_path, "'91866e9c.png"))
+
+        #c
+        #texture_bg_img = Image.open(os.path.join(texture_path, "'f61eb0e2.png"))
+        #texture_fg_img = Image.open(os.path.join(texture_path, "'b8973f04.png"))
+
+        #d
+        texture_bg_img = Image.open(os.path.join(texture_path, "'22b1c30f.png"))
+        texture_fg_img = Image.open(os.path.join(texture_path, "'f135d029.png"))
 
         img_size = 256
 
@@ -39,7 +52,7 @@ if __name__ == "__main__":
 
         for prop in [10, 20, 30, 40, 50, 60, 70, 80, 82, 85, 88, 90, 92, 95, 98]:
             dataset_path = os.path.join(
-                root_path,
+                root_path, "..", "..",
                 "data",
                 out_folder_name,
                 "alphablend_0p" + str(prop) + "_" + shape,

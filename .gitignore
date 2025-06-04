@@ -1,3 +1,15 @@
 data*
 models*
-logs*`
+logs*
+
+*__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.db
+*.sqlite3
+*.log
+
+*/lightning_logs/*
+*/models/*
