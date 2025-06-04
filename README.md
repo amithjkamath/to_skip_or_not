@@ -6,6 +6,10 @@ This repository accompanies the MICCAI 2023 paper:
 **"Do we really need that skip-connection? Understanding its interplay with task complexity"**  
 by *Amith Kamath, Jonas Willmann, Nicolaus Andratschke, Mauricio Reyes*.
 
+See a short video description of this work here:
+
+[<img src="https://i.ytimg.com/vi/YreG6vC64aw/maxresdefault.jpg" width="50%">](https://youtu.be/YreG6vC64aw "To Skip or Not to Skip")
+
 🔗 [Project Website](https://amithjkamath.github.io/projects/2023-miccai-skip-connections/)  
 ---
 
