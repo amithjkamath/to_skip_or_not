@@ -1,10 +1,7 @@
 """
 generate-random_shape-masks creates random shape mask images.
 """
-
 import os
-
-# import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 import cv2
@@ -15,6 +12,13 @@ def generate_random_mask(im_size, rad, edgy, n_pts, scale):
     """
     GENERATE_RANDOM_MASK generates a 2D image img of size im_size,
     with a random mask defined by rad and edgy.
+    :param im_size: size of the image
+    :param rad: radius of the mask
+    :param edgy: edge of the mask
+    :param n_pts: number of points
+    :param scale: scale of the mask
+
+    :return: img: 2D image with the random mask
     """
     img = np.zeros(shape=im_size, dtype=np.uint8)
     a = get_random_points(n=n_pts, scale=scale, mindst=0.001) + [0.25, 0.25]
@@ -36,8 +40,8 @@ def generate_random_mask(im_size, rad, edgy, n_pts, scale):
 
 
 if __name__ == "__main__":
-    root_path = "/home/akamath/Documents/toskipornot"
-    data_path = os.path.join(root_path, "data")
+    root_path = os.path.dirname(os.path.abspath(__file__))
+    data_path = os.path.join(root_path, "..", "..", "data")
     im_size = [256, 256]
     n_images = 100
     out_folder_name = "raw"

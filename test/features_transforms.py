@@ -1,4 +1,5 @@
-import tempfile
+import os
+import glob
 import nibabel as nib
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,41 +13,36 @@ from monai.transforms import (
 from toskipornot.features import transforms
 
 
-def test_transforms():
-    root_dir = tempfile.mkdtemp()
+def features_transforms():
+    root_dir = "/Users/amithkamath/repo/to_skip_or_not/data"
+    os.makedirs(root_dir, exist_ok=True)
     print(root_dir)
-    filenames = []
-
-    fn_keys = ("img", "seg")  # filename keys for image and seg files
-    filenames = []
 
     for i in range(5):
-        im, seg = create_test_image_3d(256, 256, 256)
-
-        im_filename = f"{root_dir}/im{i}.nii.gz"
-        seg_filename = f"{root_dir}/seg{i}.nii.gz"
-
-        filenames.append({"img": im_filename, "seg": seg_filename})
+        im, seg = create_test_image_3d(128, 128, 128)
 
         n = nib.Nifti1Image(im, np.eye(4))
-        nib.save(n, im_filename)
+        nib.save(n, os.path.join(root_dir, f"im{i}.nii.gz"))
 
         n = nib.Nifti1Image(seg, np.eye(4))
-        nib.save(n, seg_filename)
+        nib.save(n, os.path.join(root_dir, f"seg{i}.nii.gz"))
 
-    trans = LoadImage()
+    images = sorted(glob.glob(os.path.join(root_dir, "im*.nii.gz")))
+    segs = sorted(glob.glob(os.path.join(root_dir, "seg*.nii.gz")))
 
-    img, header = trans(filenames[0])
+    imtrans = Compose(
+        [
+            LoadImage(image_only=True, ensure_channel_first=True),
+            transforms.RandSaltAndPepperNoise(density=0.5),
+        ]
+    )
+
+    img, header = imtrans(images[0])
 
     print(img.shape, header["filename_or_obj"])
-    plt.imshow(img[128])
-
-    trans = Compose([LoadImage(image_only=True), transforms.RandSaltAndPepperNoise(density=0.5)])
-
-    img = trans(filenames[0])
 
     plt.imshow(img[0, 128])
 
 
 if __name__ == "__main__":
-    test_transforms()
+    features_transforms()

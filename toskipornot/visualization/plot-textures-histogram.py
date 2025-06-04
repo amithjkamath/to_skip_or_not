@@ -7,8 +7,8 @@ from toskipornot.features.analyze_features import *
 
 
 if __name__ == "__main__":
-    root_dir = "/Users/amithkamath/repo/to_skip_or_not"
-    data_path = os.path.join(root_dir, "data", "foreground-processed")
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    data_path = os.path.join(root_dir, "..", "..", "data", "background-processed")
 
     fig, ax = plt.subplots()
     fig.set_figwidth(10)

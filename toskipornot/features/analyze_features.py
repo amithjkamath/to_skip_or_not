@@ -102,30 +102,7 @@ def run_lbp_analysis(images, labels):
     for image_index in tqdm(range(n_images)):
         image = imread(images[image_index])
         label = imread(labels[image_index])
-
-        image = resize(image, (256, 256), anti_aliasing=True)
-        label = resize(label, (256, 256), anti_aliasing=False)
-
-        radius = 3
-        n_points = 8 * radius
-        METHOD = "uniform"
-
-        lbp = local_binary_pattern(image, n_points, radius, METHOD)
-
-        lbp_fg = lbp.copy()
-        img_fg = image.copy()
-        lbp_fg[label == 0] = np.nan
-        img_fg[label == 0] = 0
-
-        lbp_bg = lbp.copy()
-        img_bg = image.copy()
-        lbp_bg[label > 0] = np.nan
-        img_bg[label > 0] = 0
-
-        n_bins = int(lbp.max() + 1)
-        hist_fg, _ = np.histogram(lbp_fg, density=True, bins=n_bins, range=(0, n_bins))
-        hist_bg, _ = np.histogram(lbp_bg, density=True, bins=n_bins, range=(0, n_bins))
-        score = kullback_leibler_divergence(hist_fg, hist_bg)
+        score = compute_texture_similarity(image, label)
         distance_scores.append(score)
     return distance_scores
 
@@ -201,3 +178,42 @@ def run_edge_analysis(images, labels):
         back_edge_density.append(np.nanmean(edge_bg))
 
     return boundary_edge_density, fore_edge_density, back_edge_density
+
+
+def compute_texture_similarity(image, label):
+    """
+    COMPUTE_TEXTURE_SIMILARITY
+    Compute texture similarity between foreground and background regions of an image.
+
+    Args:
+        image: input image
+        label: binary mask of the image
+
+    Returns:
+        score: texture similarity score
+    """
+
+    image = resize(image, (256, 256), anti_aliasing=True)
+    label = resize(label, (256, 256), anti_aliasing=False)
+
+    radius = 3
+    n_points = 8 * radius
+    METHOD = "uniform"
+
+    lbp = local_binary_pattern(image, n_points, radius, METHOD)
+
+    lbp_fg = lbp.copy()
+    img_fg = image.copy()
+    lbp_fg[label == 0] = np.nan
+    img_fg[label == 0] = 0
+
+    lbp_bg = lbp.copy()
+    img_bg = image.copy()
+    lbp_bg[label > 0] = np.nan
+    img_bg[label > 0] = 0
+
+    n_bins = int(lbp.max() + 1)
+    hist_fg, _ = np.histogram(lbp_fg, density=True, bins=n_bins, range=(0, n_bins))
+    hist_bg, _ = np.histogram(lbp_bg, density=True, bins=n_bins, range=(0, n_bins))
+    score = kullback_leibler_divergence(hist_fg, hist_bg)
+    return score
