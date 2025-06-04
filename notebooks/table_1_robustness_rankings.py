@@ -7,7 +7,7 @@ import seaborn as sns
 
 def results_by_metric():
     current_path = os.path.dirname(os.path.abspath(__file__))
-    results_path = os.path.join(current_path, "..", "reports")
+    results_path = os.path.join(current_path, "..", "results")
 
     metric_list = ["Dice", "HD", "SurfaceDSC", "SurfaceDistance"]
 
