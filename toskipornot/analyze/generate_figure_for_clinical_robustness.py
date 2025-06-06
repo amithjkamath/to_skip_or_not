@@ -7,7 +7,7 @@ import seaborn as sns
 
 def analyze_clinical_robustness(metric_name="Dice"):
     current_path = os.path.dirname(os.path.abspath(__file__))
-    results_path = os.path.join(current_path, "..", "results")
+    results_path = os.path.join(current_path, "..", "..", "results")
 
     model_list = ["UNet++", "AttentionUNet", "UNet", "VNet", "NoSkipUNet", "NoSkipVNet"]
     model_alias = {
@@ -153,7 +153,14 @@ def analyze_clinical_robustness(metric_name="Dice"):
         if metric_name == "Dice":
             plt.ylim([0.0, 1.0])
 
-        plt.show()
+        plt.savefig(
+            os.path.join(
+                results_path,
+                "clinical-robustness-" + model_type + "-" + metric_name + ".png",
+            ),
+            bbox_inches="tight",
+        )
+        plt.close()
 
 
 if __name__ == "__main__":

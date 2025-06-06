@@ -4,7 +4,7 @@
 
 This repository accompanies the MICCAI 2023 paper:
 **"Do we really need that skip-connection? Understanding its interplay with task complexity"**  
-by *Amith Kamath, Jonas Willmann, Nicolaus Andratschke, Mauricio Reyes*.
+by *[Amith Kamath](https://amithjkamath.github.io), [Jonas Willmann](https://scholar.google.com/citations?user=smUWeEgAAAAJ&hl=en), [Nicolaus Andratschke](https://scholar.google.com/citations?user=n0oz878AAAAJ&hl=en), [Mauricio Reyes](https://mauricioreyes.me/)*.
 
 See a short video description of this work here:
 
@@ -72,8 +72,9 @@ Implemented using [MONAI](https://monai.io/) and PyTorch.
 git clone https://github.com/amithjkamath/to_skip_or_not.git
 cd to_skip_or_not
 uv venv .venv
+source .venv/bin/activate
 uv pip install -r pyproject.toml
-``````
+```
 
 If this is useful in your research, please consider citing:
 

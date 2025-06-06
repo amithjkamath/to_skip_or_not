@@ -11,7 +11,7 @@ warnings.filterwarnings("ignore")
 
 def analyze_synthetic_performance():
     current_path = os.path.dirname(os.path.abspath(__file__))
-    results_path = os.path.join(current_path, "..", "results")
+    results_path = os.path.join(current_path, "..", "..", "results")
 
     report_path = os.path.join(results_path, "synthetic-results")
     for_10_only = True
@@ -65,7 +65,11 @@ def analyze_synthetic_performance():
     plt.xlabel("Proportion of foreground blended")
     plt.ylabel("Relative improvement in Dice versus NoSkip-UNet")
     plt.xlim(1e-2, 1)
-    plt.show()
+    plt.savefig(
+        os.path.join(results_path, "synthetic-performance-miccai.png"),
+        bbox_inches="tight",
+    )
+    plt.close()
 
 
 if __name__ == "__main__":
