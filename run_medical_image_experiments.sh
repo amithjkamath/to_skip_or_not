@@ -1,6 +1,6 @@
 #!/bin/bash
 
-python ./toskipornot/train_busi_2d_full.py
-python ./toskipornot/train_glas_2d_full.py
-python ./toskipornot/train_heart_2d_full.py
-python ./toskipornot/train_spleen_2d_full.py
+python ./toskipornot/train/busi_2d.py
+python ./toskipornot/train/glas_2d.py
+python ./toskipornot/train/heart_2d.py
+python ./toskipornot/train/spleen_2d.py

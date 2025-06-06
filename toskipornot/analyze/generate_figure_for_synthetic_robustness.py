@@ -47,7 +47,7 @@ def plot_relative_robustness(df, max_val=1.0, min_val=0.0):
 
 def analyze_synthetic_robustness(metric="dice"):
     current_path = os.path.dirname(os.path.abspath(__file__))
-    results_path = os.path.join(current_path, "..", "results")
+    results_path = os.path.join(current_path, "..", "..", "results")
 
     direction = "back"  # "back" or "fore"
     report_path = os.path.join(results_path, direction + "ground-results")
