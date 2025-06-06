@@ -51,13 +51,13 @@ def check_dataset(train_files, data_transforms):
 
 def main():
     """
-    Runs the training and validation loop for Synthetic data segmentation.
+    Runs the training and validation loop for 2D MSD Heart data.
     """
     monai.config.print_config()
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     # Setup data directory
-    root_dir = "/home/akamath/Documents/toskipornot"
+    root_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Define Configuration
@@ -127,9 +127,7 @@ def main():
 
     # create a temporary directory and 40 random image, mask pairs
     data_dir = os.path.join(root_dir, "data/Task02_Heart-processed")
-    net_name = [
-        "NoSkipVNet"
-    ]  # net_name = ["NoSkipUNet", "UNet", "AttentionUNet", "VNet"]
+    net_name = ["NoSkipUNet", "NoSkipVNet", "UNet", "VNet", "AttentionUNet", "UNet++"]
     seed_list = [1, 2, 3]
     swin_list = [256]
     learn_rate = 0.01
