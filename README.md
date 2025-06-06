@@ -1,6 +1,6 @@
 # To Skip or Not to Skip: Investigating U-Net Skip-Connections and Task Complexity
 
-![MICCAI 2023](https://img.shields.io/badge/Conference-MICCAI%202023-blue)
+![MICCAI 2023](https://img.shields.io/badge/Conference-MICCAI%202023-blue) ![Python](https://img.shields.io/badge/python-3.11%2B-blue) ![License](https://img.shields.io/github/license/amithjkamath/to_skip_or_not) ![Testing](https://github.com/amithjkamath/to_skip_or_not/actions/workflows/test.yaml/badge.svg)
 
 This repository accompanies the MICCAI 2023 paper:
 **"Do we really need that skip-connection? Understanding its interplay with task complexity"**  
@@ -69,8 +69,11 @@ Implemented using [MONAI](https://monai.io/) and PyTorch.
 - CUDA-enabled GPU (24GB VRAM recommended)
 
 ```bash
-pip install -r requirements.txt
-```
+git clone https://github.com/amithjkamath/to_skip_or_not.git
+cd to_skip_or_not
+uv venv .venv
+uv pip install -r pyproject.toml
+``````
 
 If this is useful in your research, please consider citing:
 
