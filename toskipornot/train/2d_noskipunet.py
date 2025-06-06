@@ -270,7 +270,7 @@ def main():
     monai.config.print_config()
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     # Setup data directory
-    root_dir = "/home/akamath/Documents/toskipornot"
+    root_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 
     data_variations = [
         "alphablend_0p10_normal",

@@ -57,7 +57,7 @@ def main():
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     # Setup data directory
-    root_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    root_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Define Configuration
