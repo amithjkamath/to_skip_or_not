@@ -334,8 +334,14 @@ def main():
             set_determinism(seed=config["seed"])
 
             # create a temporary directory and 40 random image, mask pairs
-            # data_dir = "/home/akamath/Documents/toskipornot/data/BUSI-processed/"
-            data_dir = os.path.join(root_dir, "data", "foreground-processed", variation)
+            data_dir = os.path.join(
+                root_dir,
+                "data_noshare",
+                "train",
+                "synthetic",
+                "foreground-processed",
+                variation,
+            )
 
             images = sorted(glob(os.path.join(data_dir, "train", "*")))
             masks = sorted(glob(os.path.join(data_dir, "mask", "*")))

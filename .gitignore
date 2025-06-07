@@ -1,6 +1,7 @@
 *noshare*
 logs*
 wandb* 
+*_dice*_normal_seed_*
 
 *__pycache__
 *.pyc
