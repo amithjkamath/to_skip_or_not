@@ -132,7 +132,9 @@ def main():
     config["test_indices"] = order_config[500:]
 
     # create a temporary directory and 40 random image, mask pairs
-    data_dir = os.path.join(root_dir, "data/BUSI-processed")
+    data_dir = os.path.join(
+        root_dir, "data_noshare", "train", "clinical", "BUSI-processed"
+    )
     net_name = ["NoSkipUNet", "NoSkipVNet", "UNet", "VNet", "AttentionUNet", "UNet++"]
     seed_list = [1, 2, 3]
     swin_list = [256]
