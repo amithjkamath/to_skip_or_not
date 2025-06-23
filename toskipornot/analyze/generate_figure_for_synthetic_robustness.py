@@ -1,17 +1,13 @@
 import os
 import pandas as pd
-
 import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-# from toskipornot.features.analyze_features import *
 
 import warnings
 
 warnings.filterwarnings("ignore")
 
-# %%
 font = {"family": "normal", "weight": "normal", "size": 20}
 
 matplotlib.rc("font", **font)
@@ -67,14 +63,17 @@ def analyze_synthetic_robustness(metric="dice"):
     noskipunet_data = pd.read_csv(
         os.path.join(report_path, metric + "_for_NoSkipUNet.csv"), index_col=0
     )
+    noskipvnet_data = pd.read_csv(
+        os.path.join(report_path, metric + "_for_NoSkipVNet.csv"), index_col=0
+    )
 
-    # %%
     df_list = {
         "UNet++": unetplusplus_data,
         "AG-UNet": agunet_data,
         "VNet": vnet_data,
         "UNet": unet_data,
         "NoSkipUNet": noskipunet_data,
+        "NoSkipVNet": noskipvnet_data,
     }
 
     model_alias = {
@@ -89,9 +88,15 @@ def analyze_synthetic_robustness(metric="dice"):
     for net_name in df_list.keys():
         plot_robustness(df_list[net_name])
         plt.title(model_alias[net_name])
-        plt.show()
+        plt.savefig(
+            os.path.join(
+                results_path,
+                "synthetic-robustness-" + net_name + "-" + metric + ".png",
+            ),
+            bbox_inches="tight",
+        )
+        plt.close()
 
-    # %%
     baseline_data = noskipunet_data
 
     for net_name in df_list.keys():
@@ -99,9 +104,20 @@ def analyze_synthetic_robustness(metric="dice"):
         relative_df.divide(baseline_data, fill_value=0.0)
         plot_relative_robustness(relative_df, max_val=1.0, min_val=-1.0)
         plt.title(model_alias[net_name] + " - relative to NoSkipU-Net")
-        plt.show()
+        plt.savefig(
+            os.path.join(
+                results_path,
+                "synthetic-robustness-relative-to-NoSkipU-Net-"
+                + net_name
+                + "-"
+                + metric
+                + ".png",
+            ),
+            bbox_inches="tight",
+        )
+        plt.close()
 
 
 if __name__ == "__main__":
-    metric = "hd"  # "dice" or "hd", "sdsc", "surfdist"
-    analyze_synthetic_robustness(metric)
+    for metric in ["dice", "hd", "sdsc", "surfdist"]:
+        analyze_synthetic_robustness(metric)

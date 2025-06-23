@@ -164,9 +164,10 @@ def analyze_clinical_robustness(metric_name="Dice"):
 
 
 if __name__ == "__main__":
-    # Change to "Dice" for Dice score coefficient
-    # Change to "HD" for Hausdorff distance
-    # Change to "SurfaceDistance" for Average Symmetric Surface Distance
-    # Change to "SurfaceDSC" for Surface DSC
-    metric_name = "SurfaceDSC"
-    analyze_clinical_robustness(metric_name)
+    for metric_name in [
+        "Dice",
+        "SurfaceDSC",
+        "HD",
+        "SurfaceDistance",
+    ]:
+        analyze_clinical_robustness(metric_name)
