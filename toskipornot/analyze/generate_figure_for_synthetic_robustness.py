@@ -13,13 +13,13 @@ font = {"family": "normal", "weight": "normal", "size": 20}
 matplotlib.rc("font", **font)
 
 
-def plot_robustness(df, max_val=1.0, min_val=0.0):
+def plot_robustness(df, cmap="RdYlGn", max_val=1.0, min_val=0.0):
     # plt.rcParams['xtick.top'] = plt.rcParams['xtick.labeltop'] = True
     fig, ax = plt.subplots()
     fig.set_figwidth(30)
     fig.set_figheight(30)
     sns.heatmap(
-        df, annot=True, cmap="RdYlGn", vmax=max_val, vmin=min_val, cbar=False, fmt=".2f"
+        df, annot=True, cmap=cmap, vmax=max_val, vmin=min_val, cbar=False, fmt=".2f"
     )
     ax.set_xticklabels([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
     ax.set_yticklabels([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
@@ -27,13 +27,13 @@ def plot_robustness(df, max_val=1.0, min_val=0.0):
     plt.ylabel("α trained on")
 
 
-def plot_relative_robustness(df, max_val=1.0, min_val=0.0):
+def plot_relative_robustness(df, cmap="bwr", max_val=1.0, min_val=0.0):
     # plt.rcParams['xtick.top'] = plt.rcParams['xtick.labeltop'] = True
     fig, ax = plt.subplots()
     fig.set_figwidth(30)
     fig.set_figheight(30)
     sns.heatmap(
-        df, annot=True, cmap="bwr", vmax=max_val, vmin=min_val, cbar=False, fmt=".2f"
+        df, annot=True, cmap=cmap, vmax=max_val, vmin=min_val, cbar=False, fmt=".2f"
     )
     ax.set_xticklabels([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
     ax.set_yticklabels([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
@@ -86,7 +86,17 @@ def analyze_synthetic_robustness(metric="dice"):
     }
 
     for net_name in df_list.keys():
-        plot_robustness(df_list[net_name])
+        if metric in ["hd", "surfdist"]:
+            max_val = 150.0
+            min_val = 0.0
+            in_cmap = "RdYlGn_r"
+        else:
+            max_val = 1.0
+            min_val = 0.0
+            in_cmap = "RdYlGn"
+        plot_robustness(
+            df_list[net_name], cmap=in_cmap, max_val=max_val, min_val=min_val
+        )
         plt.title(model_alias[net_name])
         plt.savefig(
             os.path.join(
@@ -102,7 +112,17 @@ def analyze_synthetic_robustness(metric="dice"):
     for net_name in df_list.keys():
         relative_df = df_list[net_name] - baseline_data
         relative_df.divide(baseline_data, fill_value=0.0)
-        plot_relative_robustness(relative_df, max_val=1.0, min_val=-1.0)
+        if metric in ["hd", "surfdist"]:
+            max_val = 100.0
+            min_val = -100.0
+            in_cmap = "bwr_r"
+        else:
+            max_val = 1.0
+            min_val = -1.0
+            in_cmap = "bwr"
+        plot_relative_robustness(
+            relative_df, cmap=in_cmap, max_val=max_val, min_val=min_val
+        )
         plt.title(model_alias[net_name] + " - relative to NoSkipU-Net")
         plt.savefig(
             os.path.join(
