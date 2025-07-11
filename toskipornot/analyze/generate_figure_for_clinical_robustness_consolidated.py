@@ -107,53 +107,60 @@ def analyze_clinical_robustness(metric_name="Dice"):
         print("For texture variant: " + str(texture_variant) + " std scores;")
         print(metric_sd)
 
-    for model_name in model_list:
-        for anatomy in anatomy_list:
+    # Plotting the results
+    for anatomy in anatomy_list:
+        mean_data_dict = {
+            'x': [], # mean delta dice, for each of the four levels of perturbation
+            'y': [], # dice for the in-domain images.
+            'category': [] # model name.
+        }
+        for model_name in model_list:
+            # First, aggregate for perturbation variants
             mean_list = []
-            for texture_variant in variant_list:
-                mean_list.append(mean_data[texture_variant][model_name][anatomy])
+            std_list = []
+            for texture_variant in ["lower", "low", "high", "higher"]:
+                mean_list.append(
+                    mean_data[texture_variant][model_name][anatomy]
+                )
+                std_list.append(std_data[texture_variant][model_name][anatomy])
             mu = np.mean(mean_list)
             sigma = np.std(mean_list)
-            cv = sigma / mu
-            print("For " + anatomy + " and model: " + model_name + ", CV = " + str(cv))
 
-    for model_type in model_list:
-        data_results = []
-        for image_type in anatomy_list:
-            for variant in variant_list:
-                data_results.append(
-                    [
-                        variant_alias[variant],
-                        model_alias[model_type],
-                        anatomy_alias[image_type],
-                        mean_data[variant][model_type][image_type],
-                    ]
-                )
+            perf_mean = mean_data["in-domain"][model_name][anatomy]
+            perf_std = std_data["in-domain"][model_name][anatomy]
 
-        # plt.figure()
-        df = pd.DataFrame(
-            data_results, columns=["Texture", "Model", "Dataset", "Mean " + metric_name]
+            mean_data_dict["x"].append(mu - perf_mean)
+            mean_data_dict["y"].append(perf_mean)
+            mean_data_dict["category"].append(model_alias[model_name])
+
+        sns.scatterplot(data=mean_data_dict, x='x', y='y', hue='category', style='category')
+        plt.title(
+            "Clinical Robustness: "
+            + metric_name
+            + " for "
+            + anatomy_alias[anatomy]
+            )
+        plt.xlabel(
+            "Mean Delta "
+            + metric_name
+            + " (perturbed - in-domain) for "
+            + anatomy_alias[anatomy]
         )
-        sns.catplot(
-            data=df,
-            kind="bar",
-            x="Dataset",
-            y="Mean " + metric_name,
-            hue="Texture",
-            palette=sns.color_palette(
-                ["#d7191c", "#fdae61", "#252525", "#abd9e9", "#2c7bb6"]
-            ),
+        plt.ylabel(
+            "Mean "
+            + metric_name
+            + " for "
+            + anatomy_alias[anatomy]
         )
-        plt.title(model_alias[model_type])
         plt.grid(True)
-
         if metric_name == "Dice":
             plt.ylim([0.0, 1.0])
+            plt.xlim([-1.0, 0.0])
 
         plt.savefig(
             os.path.join(
                 results_path,
-                "clinical-robustness-" + model_type + "-" + metric_name + ".png",
+                "clinical-robustness-" + metric_name + "_" + anatomy_alias[anatomy] + ".png",
             ),
             bbox_inches="tight",
         )
