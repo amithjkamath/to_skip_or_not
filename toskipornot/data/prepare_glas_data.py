@@ -6,6 +6,7 @@ from PIL import Image
 
 import numpy as np
 from skimage.io import imread, imsave
+from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR
 
 
 def convert_images(image_set, source_dir, dest_dir, dest_name, n_images, out_idx=1):
@@ -53,7 +54,7 @@ def prepare_data(source_dir, dest_dir):
 
 
 if __name__ == "__main__":
-    root_dir = "/home/akamath/Documents/toskipornot/data/"
+    root_dir = str(DATA_DIR)
     source_dir = os.path.join(root_dir, "GLaS-raw")
     destination_dir = os.path.join(root_dir, "GLaS-processed")
     prepare_data(source_dir, destination_dir)

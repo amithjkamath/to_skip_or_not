@@ -41,6 +41,7 @@ from monai.transforms import (
     RandRotate90d,
 )
 import wandb
+from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR
 
 
 def check_dataset(train_files, data_transforms):
@@ -332,13 +333,8 @@ def main():
             set_determinism(seed=config["seed"])
 
             # create a temporary directory and 40 random image, mask pairs
-            data_dir = os.path.join(
-                root_dir,
-                "data_noshare",
-                "train",
-                "synthetic",
-                "foreground-processed",
-                variation,
+            data_dir = str(
+                DATA_DIR / "foreground-processed" / variation
             )
 
             images = sorted(glob(os.path.join(data_dir, "train", "*")))

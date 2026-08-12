@@ -27,6 +27,7 @@ from monai.data import Dataset, DataLoader, decollate_batch, list_data_collate
 from toskipornot.models.NoSkipUnet import NoSkipUNet
 from toskipornot.models.NoSkipVnet import NoSkipVNet
 from toskipornot.features.analyze_features import *
+from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR
 
 
 def run_segmentation(model, config, images, labels, output_path, variant, seed_num):
@@ -201,18 +202,12 @@ def generate_plots(data_path, model_path, output_path, model_name, variant, seed
 
 
 if __name__ == "__main__":
-    root_dir = "/home/akamath/Documents/toskipornot/"
-    model_dir = os.path.join(root_dir, "reports", "spleen-v4")
-    output_path = os.path.join(root_dir, "reports", "Spleen-results")
+    model_dir = str(CHECKPOINTS_DIR / "spleen")
+    output_path = str(RESULTS_DIR / "Spleen-results")
 
     for variant in ["lower", "low", "in-domain", "high", "higher"]:
         for seed_num in [1, 2, 3]:
-            data_path = os.path.join(
-                root_dir,
-                "data",
-                "Task09_Spleen-experiment",
-                variant,
-            )
+            data_path = str(DATA_DIR / "Task09_Spleen-experiment" / variant / "test")
 
             for model_name in [
                 "AttentionUNet",

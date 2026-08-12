@@ -36,6 +36,7 @@ import wandb
 from toskipornot.models.NoSkipUnet import NoSkipUNet
 from toskipornot.models.NoSkipVnet import NoSkipVNet
 from toskipornot.models.utils import *
+from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR
 
 
 def check_dataset(train_files, data_transforms):
@@ -132,9 +133,7 @@ def main():
     config["test_indices"] = order_config[500:]
 
     # create a temporary directory and 40 random image, mask pairs
-    data_dir = os.path.join(
-        root_dir, "data_noshare", "train", "clinical", "BUSI-processed"
-    )
+    data_dir = str(DATA_DIR / "BUSI-processed")
     net_name = ["NoSkipUNet", "NoSkipVNet", "UNet", "VNet", "AttentionUNet", "UNet++"]
     seed_list = [1, 2, 3]
     swin_list = [256]
@@ -224,10 +223,14 @@ def main():
                         device
                     )
 
+                # Keep the wandb project name as-is: the committed
+                # train-time CSVs in results/train-time-results are named
+                # after it (<dataset>-<net>-full-v3.csv), and Table 3 reads
+                # those filenames.
                 project = "busi-" + net + "-full-v3"
                 project_name = net + "_" + str(swin_size) + "_" + str(seed_num)
                 output_folder = os.path.join(
-                    root_dir, "reports", "busi-v3", project_name
+                    str(CHECKPOINTS_DIR / "busi"), project_name
                 )
                 os.makedirs(output_folder, exist_ok=True)
                 wandb.init(

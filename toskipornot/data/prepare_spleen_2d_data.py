@@ -6,6 +6,7 @@ import SimpleITK as sitk
 from skimage.io import imsave
 from skimage.transform import resize
 from skimage.exposure import rescale_intensity
+from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR
 
 
 def prepare_data(source_dir, dest_dir):
@@ -139,7 +140,7 @@ def prepare_data(source_dir, dest_dir):
 
 
 if __name__ == "__main__":
-    root_dir = "/home/akamath/Documents/toskipornot/data"
+    root_dir = str(DATA_DIR)
     source_dir = os.path.join(root_dir, "Task09_Spleen")
     destination_dir = os.path.join(root_dir, "Task09_Spleen-processed")
     prepare_data(source_dir, destination_dir)

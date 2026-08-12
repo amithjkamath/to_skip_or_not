@@ -31,9 +31,10 @@ from monai.data import Dataset, DataLoader, decollate_batch, list_data_collate
 from monai.config import print_config
 from toskipornot.models.NoSkipUnet import NoSkipUNet
 from toskipornot.models.NoSkipVnet import NoSkipVNet
+from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR
 
 
-def test_robustness(root_dir, net, model_path, output_folder):
+def test_robustness(direction, net, model_path, output_folder):
     """
     Runs the test loop for Synthetic data segmentation.
     """
@@ -57,9 +58,7 @@ def test_robustness(root_dir, net, model_path, output_folder):
 
     for variation in data_variations:
         print("For data in range: ", variation)
-        train_data_dir = os.path.join(
-            root_dir, "data", "background-processed", variation
-        )
+        train_data_dir = str(DATA_DIR / f"{direction}-processed" / variation)
         images = sorted(glob(os.path.join(train_data_dir, "train", "*")))
         masks = sorted(glob(os.path.join(train_data_dir, "mask", "*")))
 
@@ -252,8 +251,10 @@ def test_robustness(root_dir, net, model_path, output_folder):
 
 if __name__ == "__main__":
     print_config()
-    root_dir = "/Users/amithkamath/repo/to_skip_or_not/"
-    model_path = os.path.join(root_dir, "models/background-experiments-oneseed/")
+    # Blend direction: "background" (foreground bleeds into background) or
+    # "foreground". Both live under the configured checkpoints directory.
+    direction = os.environ.get("TOSKIPORNOT_SYNTHETIC_DIRECTION", "background")
+    model_path = str(CHECKPOINTS_DIR / f"synthetic-{direction}")
 
     for net in [
         "UNet++",
@@ -271,15 +272,14 @@ if __name__ == "__main__":
         for idx in [10, 20, 30, 40, 50, 60, 70, 80, 90]:
             train_model_name = "alphablend_0p" + str(idx).zfill(2) + "_normal_seed_1"
             output_path = os.path.join(
-                root_dir,
-                "reports",
-                "background_robustness",
+                str(RESULTS_DIR),
+                f"{direction}_robustness",
                 net,
                 train_model_name,
             )
             os.makedirs(output_path, exist_ok=True)
             dice, hd, sdsc, surfdist = test_robustness(
-                root_dir,
+                direction,
                 net,
                 os.path.join(model_path, net + "_dice_" + train_model_name),
                 output_path,

@@ -27,6 +27,7 @@ from monai.data import Dataset, DataLoader, decollate_batch, list_data_collate
 from toskipornot.models.NoSkipUnet import NoSkipUNet
 from toskipornot.models.NoSkipVnet import NoSkipVNet
 from toskipornot.features.analyze_features import *
+from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR
 
 
 def find_split(n_images):
@@ -206,14 +207,11 @@ def generate_plots(data_path, model_path, output_path, model_name, variant, seed
 
 
 if __name__ == "__main__":
-    root_dir = "/Users/amithkamath/repo/to_skip_or_not/"
-    model_dir = os.path.join(root_dir, "reports", "busi-v5")
-    output_path = os.path.join(root_dir, "reports", "BUSI-results")
+    model_dir = str(CHECKPOINTS_DIR / "busi")
+    output_path = str(RESULTS_DIR / "BUSI-results")
     for variant in ["lower", "low", "in-domain", "high", "higher"]:
         for seed_num in [1, 2, 3]:
-            data_path = os.path.join(
-                root_dir, "data", "BUSI-experiment", variant, "test"
-            )
+            data_path = str(DATA_DIR / "BUSI-experiment" / variant / "test")
 
             for model_name in [
                 "AttentionUNet",

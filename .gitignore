@@ -14,3 +14,14 @@ wandb*
 
 */lightning_logs/*
 */models/*
+
+# Local path configuration; .env.example IS committed as the template.
+.env
+
+# Local working copies fetched from the artifact archive (see ARTIFACTS.md).
+/checkpoints/
+/data/
+/.venv/
+# Archive-quality videos and prediction caches; docs/videos/ IS committed.
+results/videos/
+results/video-cache/

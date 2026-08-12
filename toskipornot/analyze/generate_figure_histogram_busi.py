@@ -169,7 +169,11 @@ def generate_histogram_plot():
 
     generate_data = False
 
-    root_dir = "../"
+    # Resolve against the repository root rather than the caller's cwd, so this
+    # runs the same from the repo root, from this directory, or under the tests.
+    root_dir = os.path.abspath(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
+    )
     input_folder = "BUSI-processed"
     output_folder = "BUSI-experiment"
 

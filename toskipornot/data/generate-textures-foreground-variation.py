@@ -8,12 +8,12 @@ import os
 import numpy as np
 from PIL import Image
 from random import randrange
+from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR
 
 
 if __name__ == "__main__":
-    root_path = "/home/akamath/Documents/toskipornot"
-    mask_path = os.path.join(root_path, "data", "raw")
-    texture_path = os.path.join(root_path, "data", "textures")
+    mask_path = str(DATA_DIR / "raw")
+    texture_path = str(DATA_DIR / "textures")
     out_folder_name = "foreground-processed"
 
     # for shape in ["easiest", "easier", "normal", "harder", "hardest"]:
@@ -39,8 +39,7 @@ if __name__ == "__main__":
 
         for prop in [10, 20, 30, 40, 50, 60, 70, 80, 82, 85, 88, 90, 92, 95, 98]:
             dataset_path = os.path.join(
-                root_path,
-                "data",
+                str(DATA_DIR),
                 out_folder_name,
                 "alphablend_0p" + str(prop) + "_" + shape,
             )
