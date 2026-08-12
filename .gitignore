@@ -1,4 +1,5 @@
-*noshare*
+data/*
+noshare*
 logs*
 wandb* 
 *_dice*_normal_seed_*
