@@ -1,7 +1,7 @@
 """Smoke-test the figure and table generation scripts.
 
-Large artifacts are not committed (see ARTIFACTS.md), so a script whose inputs
-are absent is skipped rather than failed. Fetch the inputs first to exercise
+Large artifacts are not committed, so a script whose inputs are absent is skipped
+rather than failed. Fetch the inputs first to exercise
 them for real:
 
     WHAT=results scripts/fetch_artifacts.sh

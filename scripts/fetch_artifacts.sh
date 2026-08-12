@@ -13,7 +13,7 @@
 # Example:
 #   TOSKIPORNOT_ARCHIVE=/Volumes/Share/2024-11-CIBM/artifacts scripts/fetch_artifacts.sh
 #
-# See ARTIFACTS.md for the archive layout and what each zip contains.
+# The archive carries a README.md manifest describing its layout and contents.
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -48,7 +48,7 @@ if [[ -z "$ARCHIVE" ]]; then
   echo "  set TOSKIPORNOT_ARCHIVE (or ARCHIVE) to the directory holding" >&2
   echo "  inputs/ and checkpoints/, e.g." >&2
   echo "    TOSKIPORNOT_ARCHIVE=~/Documents/.../2024-11-CIBM/artifacts $0" >&2
-  echo "  or copy .env.example to .env and edit it. See ARTIFACTS.md." >&2
+  echo "  or copy .env.example to .env and edit it." >&2
   exit 1
 fi
 if [[ ! -d "$ARCHIVE" ]]; then

@@ -12,8 +12,10 @@ This repository accompanies **two papers**, both by
   (journal extension: 6 architectures, 4 datasets, 5 perturbation levels, both
   synthetic blending directions)
 
-See [ARTIFACTS.md](ARTIFACTS.md) for which results belong to which paper, where
-the data and weights are archived, and a cross-paper consistency audit.
+Which results belong to which paper is set out in the tables below. Input data, model
+weights and per-image metrics are archived outside this repository and shared on
+request — see [Configuring where the data lives](#configuring-where-the-data-lives).
+Known caveats about the published numbers are recorded [below](#known-caveats).
 
 See a short video description of this work here:
 
@@ -106,7 +108,7 @@ Implemented using [MONAI](https://monai.io/) and PyTorch.
 
 Each medical test set exists at five perturbation levels, from speckle noise
 (harder) through unperturbed to background blur (easier). See
-[ARTIFACTS.md](ARTIFACTS.md) for the exact mapping to the paper labels.
+the table above for the mapping to the paper labels.
 
 ---
 
@@ -146,14 +148,71 @@ python -m toskipornot.config
 ```
 
 Only code and the demonstration videos are committed here. Input data, model
-weights, per-image metrics and rendered figures live in the artifact archive and
-are shared on request — [ARTIFACTS.md](ARTIFACTS.md) documents the layout and how
-to fetch from it:
+weights, per-image metrics and rendered figures live in the artifact archive and are
+shared on request; the archive carries its own manifest describing the layout. Fetch
+from it with:
 
 ```bash
 WHAT=results scripts/fetch_artifacts.sh   # ~16 MB, all metrics + figures
 scripts/fetch_artifacts.sh                # adds inputs and weights (~1 GB)
 ```
+
+---
+
+## Known caveats
+
+Four things a reader of either paper should know. The first three are recomputable
+from the archived metrics; the fourth is required to reproduce anything at all.
+
+### MICCAI Table 1's Spleen CT *Easier* column is superseded
+
+Of MICCAI Table 1's 27 values (3 architectures × 3 datasets × 3 perturbation levels),
+24 agree with the archived per-image metrics to ≤ 0.008 Dice. The three exceptions are
+all Spleen CT *Easier*:
+
+| Spleen CT, *Easier* | MICCAI Table 1 | Archived metrics | Seeds 1 / 2 / 3 |
+| --- | --- | --- | --- |
+| AGU-Net | 0.809 | **0.299** | 0.012 / 0.258 / 0.628 |
+| U-Net | 0.394 | **0.107** | 0.050 / 0.027 / 0.244 |
+| NoSkipU-Net | 0.486 | **0.271** | 0.082 / 0.384 / 0.349 |
+
+Spleen *Harder* and *In-domain* match MICCAI to within 0.004, so the checkpoints are
+the same ones; breast ultrasound and heart *Easier* match to within 0.001. Sweeping
+the blur strength shows MICCAI's 0.809 corresponds to a much weaker blur (`sigma` ≈
+1.0–1.7) than the `sigma=3.0` the released test set uses, so that column was most
+likely computed before the spleen blurred set settled and never refreshed. **CIBM does
+not inherit the error** — it reports spleen degrading sharply under *Easier* /
+*Easiest*, which is what the artifacts show. Anyone reusing MICCAI Table 1 should take
+the spleen *Easier* row from CIBM instead.
+
+### The blur parameter is a standard deviation, not a variance
+
+Both papers describe the *Easier* / *Easiest* perturbation as a "Gaussian kernel of
+variance 3.0" (and 7.0). The code passes those numbers to `skimage.filters.gaussian`
+as `sigma`, so the variances are 9.0 and 49.0.
+
+### The synthetic α convention is stated inconsistently
+
+Both papers print the blend as `I = αI_fg + (1−α)I_bg`, which reads as "higher α is
+easier". The code does `Image.blend(fg, bg, α)` = `fg·(1−α) + bg·α`, so **higher α is
+harder**, and the data follows the code: α=0.10 is the in-domain easy end, α=0.98 the
+hardest. Confirmed empirically — models trained at α=0.10 score ~0.99 there and
+collapse as α rises. CIBM's prose and its Figure 2 agree with the code; MICCAI's prose
+reads the opposite way, so MICCAI's α axis is inverted relative to the released data.
+
+### One detail is required to reproduce any metric
+
+MONAI's `PILReader` swaps the first two array axes relative to PIL, so the original
+training and evaluation pipeline fed the networks **transposed** images. Inference has
+to transpose to match. Without it the numbers are silently wrong but plausible —
+breast ultrasound `UNet` in-domain reads 0.598 instead of 0.748. See `predict()` in
+[`toskipornot/visualization/make_robustness_video.py`](toskipornot/visualization/make_robustness_video.py).
+
+### A degenerate checkpoint in the released weights
+
+GLaS V-Net predicts all-foreground for any input, at every seed. It is visible in the
+metrics without loading a model: `GLaS_stats_VNet_*.csv` is identical across all five
+perturbation levels (mean Dice 0.7134, std 0.2083). GLaS appears only in CIBM.
 
 If this is useful in your research, please consider citing:
 

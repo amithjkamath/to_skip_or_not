@@ -80,7 +80,7 @@ def results_path(*parts):
     return RESULTS_DIR.joinpath(*parts)
 
 
-def require(path, hint="see ARTIFACTS.md and scripts/fetch_artifacts.sh"):
+def require(path, hint="run scripts/fetch_artifacts.sh to unpack the artifacts"):
     """Fail with an actionable message instead of an obscure empty-glob error."""
     p = Path(path)
     if not p.exists():
