@@ -8,7 +8,12 @@ import os
 import numpy as np
 from PIL import Image
 from random import randrange
-from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR
+# Make the repository importable when this file is run as a plain script.
+import os as _os, sys as _sys
+_sys.path.insert(
+    0, _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "..", ".."))
+)
+from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR  # noqa: E402
 
 
 if __name__ == "__main__":

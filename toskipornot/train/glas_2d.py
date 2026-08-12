@@ -36,7 +36,12 @@ import wandb
 from toskipornot.models.NoSkipUnet import NoSkipUNet
 from toskipornot.models.NoSkipVnet import NoSkipVNet
 from toskipornot.models.utils import *
-from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR
+# Make the repository importable when this file is run as a plain script.
+import os as _os, sys as _sys
+_sys.path.insert(
+    0, _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "..", ".."))
+)
+from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR  # noqa: E402
 
 
 def check_dataset(train_files, data_transforms):

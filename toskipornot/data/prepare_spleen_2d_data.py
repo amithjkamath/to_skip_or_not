@@ -6,7 +6,12 @@ import SimpleITK as sitk
 from skimage.io import imsave
 from skimage.transform import resize
 from skimage.exposure import rescale_intensity
-from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR
+# Make the repository importable when this file is run as a plain script.
+import os as _os, sys as _sys
+_sys.path.insert(
+    0, _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "..", ".."))
+)
+from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR  # noqa: E402
 
 
 def prepare_data(source_dir, dest_dir):

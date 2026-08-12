@@ -22,6 +22,9 @@ wandb*
 /checkpoints/
 /data/
 /.venv/
-# Archive-quality videos and prediction caches; docs/videos/ IS committed.
-results/videos/
-results/video-cache/
+
+# Nothing large is committed. Metrics CSVs, rendered figures, archive-quality
+# videos and prediction caches all live in the artifact archive and are fetched
+# with scripts/fetch_artifacts.sh. The only committed media is docs/videos/,
+# the small demonstration loops.
+/results/

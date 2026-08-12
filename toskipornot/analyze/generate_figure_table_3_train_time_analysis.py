@@ -4,13 +4,19 @@ import numpy as np
 import pandas as pd
 
 import warnings
+# Make the repository importable when this file is run as a plain script.
+import os as _os, sys as _sys
+_sys.path.insert(
+    0, _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "..", ".."))
+)
+from toskipornot.config import RESULTS_DIR  # noqa: E402
 
 warnings.filterwarnings("ignore")
 
 
 def train_time_metrics():
     current_path = os.path.dirname(os.path.abspath(__file__))
-    results_path = os.path.join(current_path, "..", "..", "results")
+    results_path = str(RESULTS_DIR)
 
     report_path = os.path.join(results_path, "train-time-results")
 

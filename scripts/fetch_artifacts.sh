@@ -28,8 +28,18 @@ from toskipornot import config
 print(f'ARCHIVE={config.ARCHIVE_DIR or ""}')
 print(f'DATA_DIR="{config.DATA_DIR}"')
 print(f'CKPT_DIR="{config.CHECKPOINTS_DIR}"')
+print(f'RESULTS_DIR="{config.RESULTS_DIR}"')
 EOF
 )"
+
+# What to fetch. "results" is cheap (~16 MB) and is what the figure and table
+# scripts read; "inputs" and "checkpoints" are large and only needed to re-run
+# inference or rebuild the videos.
+WHAT="${WHAT:-all}"
+case "$WHAT" in
+  all|results|models) ;;
+  *) echo "error: WHAT must be one of: all, results, models" >&2; exit 1 ;;
+esac
 
 # Allow the shorter ARCHIVE=... spelling on the command line too.
 ARCHIVE="${ARCHIVE:-}"
@@ -75,6 +85,30 @@ release() {
   [[ $ON_CLOUD -eq 1 ]] || return 0
   brctl evict "$1" >/dev/null 2>&1 || true
 }
+
+echo "==> results (per-image metrics for every scenario, plus rendered figures)"
+for part in metrics-medical metrics-synthetic metrics-train-time figures; do
+  materialise "$ARCHIVE/results/$part.zip"
+  ZIP="$ARCHIVE/results/$part.zip" DEST="$RESULTS_DIR" "$PY" - <<'EOF'
+import os, zipfile
+dest = os.environ["DEST"]
+z = zipfile.ZipFile(os.environ["ZIP"])
+names = [n for n in z.namelist() if not n.endswith("/")]
+for n in names:
+    target = os.path.join(dest, n)
+    os.makedirs(os.path.dirname(target), exist_ok=True)
+    with z.open(n) as src, open(target, "wb") as out:
+        out.write(src.read())
+print(f"  {os.path.basename(os.environ['ZIP'])}: {len(names)} files")
+EOF
+  release "$ARCHIVE/results/$part.zip"
+done
+
+if [[ "$WHAT" == "results" ]]; then
+  echo
+  echo "done (results only). Re-run with WHAT=all for inputs and checkpoints."
+  exit 0
+fi
 
 echo "==> inputs (test images, masks and the five perturbed sets per dataset)"
 materialise "$ARCHIVE/inputs/all-datasets.zip"

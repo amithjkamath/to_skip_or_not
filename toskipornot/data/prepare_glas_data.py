@@ -6,7 +6,12 @@ from PIL import Image
 
 import numpy as np
 from skimage.io import imread, imsave
-from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR
+# Make the repository importable when this file is run as a plain script.
+import os as _os, sys as _sys
+_sys.path.insert(
+    0, _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "..", ".."))
+)
+from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR  # noqa: E402
 
 
 def convert_images(image_set, source_dir, dest_dir, dest_name, n_images, out_idx=1):

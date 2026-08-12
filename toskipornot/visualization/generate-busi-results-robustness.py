@@ -27,7 +27,12 @@ from monai.data import Dataset, DataLoader, decollate_batch, list_data_collate
 from toskipornot.models.NoSkipUnet import NoSkipUNet
 from toskipornot.models.NoSkipVnet import NoSkipVNet
 from toskipornot.features.analyze_features import *
-from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR
+# Make the repository importable when this file is run as a plain script.
+import os as _os, sys as _sys
+_sys.path.insert(
+    0, _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "..", ".."))
+)
+from toskipornot.config import DATA_DIR, CHECKPOINTS_DIR, RESULTS_DIR  # noqa: E402
 
 
 def find_split(n_images):

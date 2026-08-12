@@ -5,6 +5,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 import warnings
+# Make the repository importable when this file is run as a plain script.
+import os as _os, sys as _sys
+_sys.path.insert(
+    0, _os.path.abspath(_os.path.join(_os.path.dirname(__file__), "..", ".."))
+)
+from toskipornot.config import RESULTS_DIR  # noqa: E402
 
 warnings.filterwarnings("ignore")
 
@@ -43,7 +49,7 @@ def plot_relative_robustness(df, cmap="bwr", max_val=1.0, min_val=0.0):
 
 def analyze_synthetic_robustness(metric="dice"):
     current_path = os.path.dirname(os.path.abspath(__file__))
-    results_path = os.path.join(current_path, "..", "..", "results")
+    results_path = str(RESULTS_DIR)
 
     direction = "back"  # "back" or "fore"
     report_path = os.path.join(results_path, direction + "ground-results")

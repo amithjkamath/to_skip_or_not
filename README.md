@@ -145,8 +145,15 @@ once `scripts/fetch_artifacts.sh` has unpacked the archives. Verify with:
 python -m toskipornot.config
 ```
 
-Input data, model weights and full-resolution videos are not committed here.
-[ARTIFACTS.md](ARTIFACTS.md) documents the archive and how to fetch from it.
+Only code and the demonstration videos are committed here. Input data, model
+weights, per-image metrics and rendered figures live in the artifact archive and
+are shared on request — [ARTIFACTS.md](ARTIFACTS.md) documents the layout and how
+to fetch from it:
+
+```bash
+WHAT=results scripts/fetch_artifacts.sh   # ~16 MB, all metrics + figures
+scripts/fetch_artifacts.sh                # adds inputs and weights (~1 GB)
+```
 
 If this is useful in your research, please consider citing:
 
