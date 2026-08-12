@@ -19,7 +19,7 @@ See a short video description of this work here:
 
 [<img src="https://i.ytimg.com/vi/YreG6vC64aw/maxresdefault.jpg" width="50%">](https://youtu.be/YreG6vC64aw "To Skip or Not to Skip")
 
-🔗 [Project Website](https://amithjkamath.github.io/projects/2023-miccai-skip-connections/)  
+🔗 [Project Website](https://amithjkamath.github.io/to_skip_or_not/)  
 ---
 
 ## Overview

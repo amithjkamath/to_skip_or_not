@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Do we really need that skip-connection?</title>
+<meta name="description" content="Skip connections in U-Net architectures help when foreground and background look different, and hurt when they do not. MICCAI 2023 and Computers in Biology and Medicine 2025." />
+<meta property="og:title" content="Do we really need that skip-connection?" />
+<meta property="og:description" content="Understanding the interplay between skip connections and task complexity in medical image segmentation." />
+<meta property="og:image" content="https://amithjkamath.github.io/to_skip_or_not/img/method-overview.png" />
+<meta property="og:type" content="website" />
+<style>
+:root {
+  color-scheme: light;
+  --surface:        #fcfcfb;
+  --surface-2:      #f4f4f1;
+  --rule:           #e2e1dc;
+  --text-primary:   #101010;
+  --text-secondary: #52514e;
+  --text-muted:     #77766f;
+  --accent:         #1c5cab;
+  --g1: #2a78d6;   /* no-skip   */
+  --g2: #eb6834;   /* standard  */
+  --g3: #1baf7a;   /* enhanced  */
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --surface:        #16161a;
+    --surface-2:      #1f1f24;
+    --rule:           #33333a;
+    --text-primary:   #f4f4f2;
+    --text-secondary: #bebdb6;
+    --text-muted:     #94938c;
+    --accent:         #86b6ef;
+    --g1: #3987e5;
+    --g2: #d95926;
+    --g3: #199e70;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 820px; margin: 0 auto; padding: 0 20px; }
+a { color: var(--accent); }
+
+/* ---------- header ---------- */
+header { padding: 56px 0 8px; text-align: center; }
+.venue {
+  font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 20px;
+}
+h1 { font-size: clamp(1.9rem, 4.6vw, 2.9rem); line-height: 1.15; margin: 0 0 10px; letter-spacing: -0.02em; }
+.subtitle { font-size: clamp(1.05rem, 2.2vw, 1.3rem); color: var(--text-secondary); margin: 0 0 26px; font-weight: 400; }
+.authors { margin: 0 0 6px; line-height: 2; }
+.authors a { text-decoration: none; }
+.authors a:hover { text-decoration: underline; }
+.affil { color: var(--text-secondary); font-size: 0.9rem; margin: 0 0 4px; }
+.award { color: var(--text-secondary); font-size: 0.9rem; margin: 14px 0 0; }
+.tldr {
+  max-width: 640px; margin: 26px auto 0; padding: 14px 18px;
+  background: var(--surface-2); border-radius: 8px;
+  font-size: 0.98rem; color: var(--text-secondary); text-align: left;
+}
+.tldr b { color: var(--text-primary); }
+.btns { display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; margin: 28px 0 8px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 16px; border-radius: 999px; text-decoration: none;
+  background: var(--text-primary); color: var(--surface);
+  font-size: 0.88rem; font-weight: 500; border: 1px solid var(--text-primary);
+}
+.btn:hover { opacity: 0.85; }
+.btn.ghost { background: transparent; color: var(--text-primary); border-color: var(--rule); }
+
+/* ---------- sections ---------- */
+main { padding-bottom: 72px; }
+section { padding-top: 44px; }
+h2 { font-size: 1.5rem; margin: 0 0 14px; letter-spacing: -0.01em; }
+h3 { font-size: 1.08rem; margin: 30px 0 8px; }
+p { margin: 0 0 15px; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 44px 0 0; }
+figure { margin: 24px 0; }
+figure img { width: 100%; height: auto; border-radius: 6px; display: block; }
+figcaption { font-size: 0.87rem; color: var(--text-secondary); margin-top: 9px; line-height: 1.5; }
+figcaption strong { display: block; color: var(--text-primary); margin-bottom: 2px; }
+ul { padding-left: 20px; margin: 0 0 15px; }
+li { margin-bottom: 9px; }
+.lead { color: var(--text-secondary); }
+
+/* ---------- tables ---------- */
+.scroll { overflow-x: auto; margin: 20px 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.86rem; }
+th, td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th[scope="row"], thead th:first-child { text-align: left; font-weight: 500; }
+thead th { color: var(--text-secondary); font-weight: 600; font-size: 0.8rem; }
+.dsrow th { text-align: left; padding-top: 16px; font-size: 0.82rem; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--text-muted); border-bottom-color: transparent; }
+.drop { color: var(--text-secondary); }
+.sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 8px; vertical-align: middle; }
+.sw.g1 { background: var(--g1); } .sw.g2 { background: var(--g2); } .sw.g3 { background: var(--g3); }
+table.plain td, table.plain th { text-align: left; white-space: normal; }
+
+/* ---------- charts ---------- */
+.facets { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 8px; margin: 8px 0 4px; }
+.facet { width: 100%; height: auto; overflow: visible; }
+.facet-title { font-size: 10px; font-weight: 600; fill: var(--text-primary); }
+.grid { stroke: var(--rule); stroke-width: 1; }
+.axis { stroke: var(--text-muted); stroke-width: 1; }
+.tick { font-size: 8px; fill: var(--text-muted); }
+.xtick { font-size: 8px; }
+.ln { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.ln.dash { stroke-dasharray: 5 3; }
+.pt { stroke: var(--surface); stroke-width: 1.5; }
+.hit { fill: transparent; }
+.g1 { stroke: var(--g1); } circle.g1 { fill: var(--g1); }
+.g2 { stroke: var(--g2); } circle.g2 { fill: var(--g2); }
+.g3 { stroke: var(--g3); } circle.g3 { fill: var(--g3); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 0.83rem; color: var(--text-secondary); margin: 14px 0 4px; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend svg { flex: none; }
+
+/* ---------- demos ---------- */
+.demos { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 26px; margin-top: 20px; }
+.demo { margin: 0; }
+.demo video { width: 100%; height: auto; display: block; border-radius: 6px; background: #0d1117; }
+
+/* ---------- bibtex ---------- */
+pre {
+  background: var(--surface-2); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 14px 16px; overflow-x: auto; font-size: 0.78rem; line-height: 1.6;
+  color: var(--text-secondary); margin: 0 0 16px;
+}
+footer { border-top: 1px solid var(--rule); padding: 26px 0 60px; font-size: 0.84rem; color: var(--text-muted); }
+footer a { color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="venue">MICCAI 2023 &nbsp;&middot;&nbsp; Computers in Biology and Medicine 2025</p>
+    <h1>Do we really need that skip-connection?</h1>
+    <p class="subtitle">Understanding its interplay with task complexity</p>
+
+    <p class="authors">
+      <a href="https://amithjkamath.github.io">Amith Kamath</a><sup>1</sup>,
+      <a href="https://scholar.google.com/citations?user=smUWeEgAAAAJ&amp;hl=en">Jonas Willmann</a><sup>1,2</sup>,
+      <a href="https://scholar.google.com/citations?user=n0oz878AAAAJ&amp;hl=en">Nicolaus Andratschke</a><sup>2</sup>,
+      <a href="https://mauricioreyes.me/">Mauricio Reyes</a><sup>1</sup>
+    </p>
+    <p class="affil"><sup>1</sup>University of Bern &nbsp;&nbsp; <sup>2</sup>University Hospital Zurich</p>
+    <p class="award">Early accept at MICCAI 2023 (top 14%) &nbsp;&middot;&nbsp; Uni Bern BME Club Travel Award</p>
+
+    <div class="btns">
+      <a class="btn" href="https://link.springer.com/chapter/10.1007/978-3-031-43901-8_29">MICCAI paper</a>
+      <a class="btn" href="https://www.sciencedirect.com/science/article/pii/S0010482524014951">Journal extension</a>
+      <a class="btn ghost" href="https://github.com/amithjkamath/to_skip_or_not">Code</a>
+      <a class="btn ghost" href="https://www.youtube.com/watch?v=YreG6vC64aw">Talk</a>
+      <a class="btn ghost" href="https://huggingface.co/spaces/amithjkamath/segroc">Try it</a>
+    </div>
+
+    <p class="tldr"><b>In short.</b> Skip connections are treated as a default in U-Net style
+    segmentation. They earn their place when the object and its background look different from
+    each other. When the two textures converge, the same skips are what carry the failure, and a
+    plain encoder&ndash;decoder with no skips at all holds up better.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <figure>
+    <img src="img/method-overview.png" alt="Overview: synthetic images with a textured foreground on a textured background are segmented by three U-Net variants; task complexity is measured as the KL divergence between local binary pattern histograms of foreground and background." />
+    <figcaption>The setup. We generate images whose foreground and background textures we can move together or apart, measure how similar they are, and watch what each architecture does as that similarity increases.</figcaption>
+  </figure>
+
+  <section id="abstract">
+    <h2>Abstract</h2>
+    <p>Skip connections are considered essential in U-Net architectures for medical image
+    segmentation, on the grounds that they preserve fine detail by bridging encoder and decoder
+    layers. But are they always necessary? We introduce a measure of task complexity based on the
+    texture disparity between foreground and background, and use it to ask when skip connections
+    help and when they hurt.</p>
+    <p>Across controlled synthetic experiments and real datasets spanning breast ultrasound, colon
+    histology, cardiac MRI and abdominal CT, a consistent picture emerges. Skip connections give
+    little benefit at low and medium complexity, and become genuinely useful only when foreground
+    and background are hard to tell apart. At the same time they carry a cost: architectures with
+    denser skips degrade far more sharply under distribution shift than the same networks with the
+    skips removed. Performance and robustness pull in opposite directions, and for safety-critical
+    deployment the simpler architecture is often the better bet.</p>
+  </section>
+
+  <section id="findings">
+    <h2>What we found</h2>
+    <ul>
+      <li><strong>Skips are conditional, not universal.</strong> Their benefit grows with task
+      complexity. On easy tasks a no-skip network matches or beats the standard U-Net.</li>
+      <li><strong>Accuracy and robustness diverge.</strong> The architecture with the best
+      in-distribution score is frequently the one that falls furthest under shift.</li>
+      <li><strong>Denser is more fragile.</strong> U-Net++ and attention-gated skips lead on clean
+      data and collapse hardest on perturbed data. On heart MRI, U-Net++ goes from 0.925 Dice to
+      0.000.</li>
+      <li><strong>A mean hides the failure.</strong> The two synthetic sweeps below fail in opposite
+      ways, losing the object and hallucinating it everywhere, and a single averaged score cannot
+      tell them apart.</li>
+    </ul>
+  </section>
+
+  <section id="method">
+    <h2>How task complexity is measured</h2>
+    <p>We need a number that says how hard it is to tell foreground from background in a given
+    image. We take local binary pattern histograms of each region and compute the KL divergence
+    between them. A large divergence means the two textures are easy to separate and the task is
+    easy; as the divergence shrinks the task gets harder in a way we can dial continuously with a
+    blending parameter &alpha;.</p>
+
+    <h3>The architectures</h3>
+    <p>Six models in three groups, so that each network with skips has a near-identical partner
+    without them. That pairing is what isolates the effect.</p>
+    <div class="scroll">
+      <table class="plain">
+        <thead><tr><th>Group</th><th>Models</th><th>Skip connections</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><span class="sw g1"></span>No-skip</th><td>NoSkip U-Net, NoSkip V-Net</td><td>None; encoder and decoder communicate only through the bottleneck</td></tr>
+          <tr><th scope="row"><span class="sw g2"></span>Standard</th><td>U-Net, V-Net</td><td>Identity skips, by concatenation and by addition respectively</td></tr>
+          <tr><th scope="row"><span class="sw g3"></span>Enhanced</th><td>AGU-Net, U-Net++</td><td>Attention-gated skips and dense nested skips</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lead">Implemented with <a href="https://monai.io/">MONAI</a> and PyTorch. Three seeds per
+    configuration on the medical datasets.</p>
+  </section>
+
+  <section id="demos">
+    <h2>Watching it break</h2>
+    <p>Each clip runs all six architectures over the same test images while the texture disparity
+    is dialled away from the training distribution. Read a panel left to right: the clean image,
+    the ground truth, the image the model actually sees, and its prediction laid over the truth
+    with a Dice score (1.000 is perfect, 0.000 means it found nothing). Cyan is the expert
+    annotation, magenta is the model. Each row is one architecture, arranged so that every
+    skip-connected model sits beside its no-skip twin.</p>
+    <p class="lead">The panels are dense. Use the fullscreen control on any clip to read the scores.</p>
+    <div class="demos">
+      <figure class="demo">
+        <video controls loop muted playsinline preload="none" poster="img/synthetic_foreground-poster.jpg">
+          <source src="videos/robustness_synthetic_foreground.mp4" type="video/mp4" />
+          Your browser does not support embedded video.
+        </video>
+        <figcaption><strong>The blob starts to look like its background</strong>A textured shape on a textured background, with a dial (&alpha;) that mixes the background texture into the shape. At &alpha;&nbsp;=&nbsp;0.10 the images match training. By &alpha;&nbsp;=&nbsp;0.88 the two are nearly the same material, and the models with skips are the first to lose the object entirely.</figcaption>
+      </figure>
+      <figure class="demo">
+        <video controls loop muted playsinline preload="none" poster="img/synthetic_background-poster.jpg">
+          <source src="videos/robustness_synthetic_background.mp4" type="video/mp4" />
+          Your browser does not support embedded video.
+        </video>
+        <figcaption><strong>The background starts to look like the blob</strong>The same blend running the other way. The failure changes character completely: instead of losing the object, the skip-connected models start finding it everywhere. Two failures this different can average to the same Dice, which is the case against reporting only a mean.</figcaption>
+      </figure>
+      <figure class="demo">
+        <video controls loop muted playsinline preload="none" poster="img/busi-poster.jpg">
+          <source src="videos/robustness_busi.mp4" type="video/mp4" />
+          Your browser does not support embedded video.
+        </video>
+        <figcaption><strong>Breast ultrasound (BUSI)</strong>Lesion segmentation in a modality that is speckled to begin with, so added speckle is a realistic stressor rather than an artificial one.</figcaption>
+      </figure>
+      <figure class="demo">
+        <video controls loop muted playsinline preload="none" poster="img/glas-poster.jpg">
+          <source src="videos/robustness_glas.mp4" type="video/mp4" />
+          Your browser does not support embedded video.
+        </video>
+        <figcaption><strong>Colon histology (GLaS)</strong>Gland segmentation, where the boundary is defined by texture rather than intensity. This is the hardest setting for an architecture that leans on fine detail.</figcaption>
+      </figure>
+      <figure class="demo">
+        <video controls loop muted playsinline preload="none" poster="img/heart-poster.jpg">
+          <source src="videos/robustness_heart.mp4" type="video/mp4" />
+          Your browser does not support embedded video.
+        </video>
+        <figcaption><strong>Left atrium (heart MRI)</strong>A structure with a strong, consistent shape prior. Degradation is gentler here and the architectures stay closer together.</figcaption>
+      </figure>
+      <figure class="demo">
+        <video controls loop muted playsinline preload="none" poster="img/spleen-poster.jpg">
+          <source src="videos/robustness_spleen.mp4" type="video/mp4" />
+          Your browser does not support embedded video.
+        </video>
+        <figcaption><strong>Spleen (CT)</strong>A large organ in a modality with standardised intensities, included to test whether the pattern holds when texture is not the dominant cue.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="results">
+    <h2>Results</h2>
+    <p>Mean Dice on the held-out test sets, averaged over three seeds, as the perturbation moves
+    from background blur (easier than training) through the unperturbed images to speckle noise
+    (harder). Lines that stay flat are robust; lines that fall off a cliff are not.</p>
+
+    <div class="legend">
+      <span><svg width="26" height="10"><line x1="1" y1="5" x2="25" y2="5" stroke="var(--g1)" stroke-width="2"/></svg> No-skip</span>
+      <span><svg width="26" height="10"><line x1="1" y1="5" x2="25" y2="5" stroke="var(--g2)" stroke-width="2"/></svg> Standard</span>
+      <span><svg width="26" height="10"><line x1="1" y1="5" x2="25" y2="5" stroke="var(--g3)" stroke-width="2"/></svg> Enhanced</span>
+      <span><svg width="26" height="10"><line x1="1" y1="5" x2="25" y2="5" stroke="var(--text-muted)" stroke-width="2"/></svg> U-Net backbone</span>
+      <span><svg width="26" height="10"><line x1="1" y1="5" x2="25" y2="5" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="5 3"/></svg> V-Net backbone</span>
+    </div>
+
+    <div class="facets">
+<svg class="facet" viewBox="0 0 300 196" role="img" aria-label="Mean Dice for Breast ultrasound (BUSI)">
+<text class="facet-title" x="40" y="14">Breast ultrasound (BUSI)</text>
+<line class="grid" x1="40" y1="156.0" x2="290" y2="156.0"/>
+<text class="tick" x="34" y="159.5" text-anchor="end">0.00</text>
+<line class="grid" x1="40" y1="123.5" x2="290" y2="123.5"/>
+<text class="tick" x="34" y="127.0" text-anchor="end">0.25</text>
+<line class="grid" x1="40" y1="91.0" x2="290" y2="91.0"/>
+<text class="tick" x="34" y="94.5" text-anchor="end">0.50</text>
+<line class="grid" x1="40" y1="58.5" x2="290" y2="58.5"/>
+<text class="tick" x="34" y="62.0" text-anchor="end">0.75</text>
+<line class="grid" x1="40" y1="26.0" x2="290" y2="26.0"/>
+<text class="tick" x="34" y="29.5" text-anchor="end">1.00</text>
+<text class="tick xtick" x="40.0" y="170" text-anchor="end" transform="rotate(-40 40.0 170)">Easiest</text>
+<text class="tick xtick" x="102.5" y="170" text-anchor="end" transform="rotate(-40 102.5 170)">Easier</text>
+<text class="tick xtick" x="165.0" y="170" text-anchor="end" transform="rotate(-40 165.0 170)">Unpert.</text>
+<text class="tick xtick" x="227.5" y="170" text-anchor="end" transform="rotate(-40 227.5 170)">Harder</text>
+<text class="tick xtick" x="290.0" y="170" text-anchor="end" transform="rotate(-40 290.0 170)">Hardest</text>
+<path class="ln g1 solid" d="M40.0 59.2 L102.5 58.7 L165.0 57.1 L227.5 60.4 L290.0 75.4"/>
+<circle class="pt g1" cx="40.0" cy="59.2" r="2.6"/>
+<circle class="hit" cx="40.0" cy="59.2" r="9"><title>NoSkip U-Net · Easiest · Dice 0.744</title></circle>
+<circle class="pt g1" cx="102.5" cy="58.7" r="2.6"/>
+<circle class="hit" cx="102.5" cy="58.7" r="9"><title>NoSkip U-Net · Easier · Dice 0.749</title></circle>
+<circle class="pt g1" cx="165.0" cy="57.1" r="2.6"/>
+<circle class="hit" cx="165.0" cy="57.1" r="9"><title>NoSkip U-Net · Unperturbed · Dice 0.761</title></circle>
+<circle class="pt g1" cx="227.5" cy="60.4" r="2.6"/>
+<circle class="hit" cx="227.5" cy="60.4" r="9"><title>NoSkip U-Net · Harder · Dice 0.735</title></circle>
+<circle class="pt g1" cx="290.0" cy="75.4" r="2.6"/>
+<circle class="hit" cx="290.0" cy="75.4" r="9"><title>NoSkip U-Net · Hardest · Dice 0.620</title></circle>
+<path class="ln g1 dash" d="M40.0 59.4 L102.5 57.0 L165.0 57.2 L227.5 58.3 L290.0 61.1"/>
+<circle class="pt g1" cx="40.0" cy="59.4" r="2.6"/>
+<circle class="hit" cx="40.0" cy="59.4" r="9"><title>NoSkip V-Net · Easiest · Dice 0.743</title></circle>
+<circle class="pt g1" cx="102.5" cy="57.0" r="2.6"/>
+<circle class="hit" cx="102.5" cy="57.0" r="9"><title>NoSkip V-Net · Easier · Dice 0.762</title></circle>
+<circle class="pt g1" cx="165.0" cy="57.2" r="2.6"/>
+<circle class="hit" cx="165.0" cy="57.2" r="9"><title>NoSkip V-Net · Unperturbed · Dice 0.760</title></circle>
+<circle class="pt g1" cx="227.5" cy="58.3" r="2.6"/>
+<circle class="hit" cx="227.5" cy="58.3" r="9"><title>NoSkip V-Net · Harder · Dice 0.752</title></circle>
+<circle class="pt g1" cx="290.0" cy="61.1" r="2.6"/>
+<circle class="hit" cx="290.0" cy="61.1" r="9"><title>NoSkip V-Net · Hardest · Dice 0.730</title></circle>
+<path class="ln g2 solid" d="M40.0 59.2 L102.5 60.3 L165.0 56.9 L227.5 62.0 L290.0 77.0"/>
+<circle class="pt g2" cx="40.0" cy="59.2" r="2.6"/>
+<circle class="hit" cx="40.0" cy="59.2" r="9"><title>U-Net · Easiest · Dice 0.745</title></circle>
+<circle class="pt g2" cx="102.5" cy="60.3" r="2.6"/>
+<circle class="hit" cx="102.5" cy="60.3" r="9"><title>U-Net · Easier · Dice 0.736</title></circle>
+<circle class="pt g2" cx="165.0" cy="56.9" r="2.6"/>
+<circle class="hit" cx="165.0" cy="56.9" r="9"><title>U-Net · Unperturbed · Dice 0.763</title></circle>
+<circle class="pt g2" cx="227.5" cy="62.0" r="2.6"/>
+<circle class="hit" cx="227.5" cy="62.0" r="9"><title>U-Net · Harder · Dice 0.723</title></circle>
+<circle class="pt g2" cx="290.0" cy="77.0" r="2.6"/>
+<circle class="hit" cx="290.0" cy="77.0" r="9"><title>U-Net · Hardest · Dice 0.607</title></circle>
+<path class="ln g2 dash" d="M40.0 63.3 L102.5 62.8 L165.0 61.9 L227.5 63.5 L290.0 66.3"/>
+<circle class="pt g2" cx="40.0" cy="63.3" r="2.6"/>
+<circle class="hit" cx="40.0" cy="63.3" r="9"><title>V-Net · Easiest · Dice 0.713</title></circle>
+<circle class="pt g2" cx="102.5" cy="62.8" r="2.6"/>
+<circle class="hit" cx="102.5" cy="62.8" r="9"><title>V-Net · Easier · Dice 0.717</title></circle>
+<circle class="pt g2" cx="165.0" cy="61.9" r="2.6"/>
+<circle class="hit" cx="165.0" cy="61.9" r="9"><title>V-Net · Unperturbed · Dice 0.724</title></circle>
+<circle class="pt g2" cx="227.5" cy="63.5" r="2.6"/>
+<circle class="hit" cx="227.5" cy="63.5" r="9"><title>V-Net · Harder · Dice 0.712</title></circle>
+<circle class="pt g2" cx="290.0" cy="66.3" r="2.6"/>
+<circle class="hit" cx="290.0" cy="66.3" r="9"><title>V-Net · Hardest · Dice 0.690</title></circle>
+<path class="ln g3 solid" d="M40.0 51.5 L102.5 52.1 L165.0 52.6 L227.5 72.1 L290.0 93.1"/>
+<circle class="pt g3" cx="40.0" cy="51.5" r="2.6"/>
+<circle class="hit" cx="40.0" cy="51.5" r="9"><title>AGU-Net · Easiest · Dice 0.804</title></circle>
+<circle class="pt g3" cx="102.5" cy="52.1" r="2.6"/>
+<circle class="hit" cx="102.5" cy="52.1" r="9"><title>AGU-Net · Easier · Dice 0.799</title></circle>
+<circle class="pt g3" cx="165.0" cy="52.6" r="2.6"/>
+<circle class="hit" cx="165.0" cy="52.6" r="9"><title>AGU-Net · Unperturbed · Dice 0.795</title></circle>
+<circle class="pt g3" cx="227.5" cy="72.1" r="2.6"/>
+<circle class="hit" cx="227.5" cy="72.1" r="9"><title>AGU-Net · Harder · Dice 0.646</title></circle>
+<circle class="pt g3" cx="290.0" cy="93.1" r="2.6"/>
+<circle class="hit" cx="290.0" cy="93.1" r="9"><title>AGU-Net · Hardest · Dice 0.484</title></circle>
+<path class="ln g3 dash" d="M40.0 59.1 L102.5 63.2 L165.0 60.7 L227.5 99.8 L290.0 134.5"/>
+<circle class="pt g3" cx="40.0" cy="59.1" r="2.6"/>
+<circle class="hit" cx="40.0" cy="59.1" r="9"><title>U-Net++ · Easiest · Dice 0.746</title></circle>
+<circle class="pt g3" cx="102.5" cy="63.2" r="2.6"/>
+<circle class="hit" cx="102.5" cy="63.2" r="9"><title>U-Net++ · Easier · Dice 0.714</title></circle>
+<circle class="pt g3" cx="165.0" cy="60.7" r="2.6"/>
+<circle class="hit" cx="165.0" cy="60.7" r="9"><title>U-Net++ · Unperturbed · Dice 0.733</title></circle>
+<circle class="pt g3" cx="227.5" cy="99.8" r="2.6"/>
+<circle class="hit" cx="227.5" cy="99.8" r="9"><title>U-Net++ · Harder · Dice 0.432</title></circle>
+<circle class="pt g3" cx="290.0" cy="134.5" r="2.6"/>
+<circle class="hit" cx="290.0" cy="134.5" r="9"><title>U-Net++ · Hardest · Dice 0.165</title></circle>
+<line class="axis" x1="40" y1="156.0" x2="290" y2="156.0"/>
+</svg>
+<svg class="facet" viewBox="0 0 300 196" role="img" aria-label="Mean Dice for Colon histology (GLaS)">
+<text class="facet-title" x="40" y="14">Colon histology (GLaS)</text>
+<line class="grid" x1="40" y1="156.0" x2="290" y2="156.0"/>
+<text class="tick" x="34" y="159.5" text-anchor="end">0.00</text>
+<line class="grid" x1="40" y1="123.5" x2="290" y2="123.5"/>
+<text class="tick" x="34" y="127.0" text-anchor="end">0.25</text>
+<line class="grid" x1="40" y1="91.0" x2="290" y2="91.0"/>
+<text class="tick" x="34" y="94.5" text-anchor="end">0.50</text>
+<line class="grid" x1="40" y1="58.5" x2="290" y2="58.5"/>
+<text class="tick" x="34" y="62.0" text-anchor="end">0.75</text>
+<line class="grid" x1="40" y1="26.0" x2="290" y2="26.0"/>
+<text class="tick" x="34" y="29.5" text-anchor="end">1.00</text>
+<text class="tick xtick" x="40.0" y="170" text-anchor="end" transform="rotate(-40 40.0 170)">Easiest</text>
+<text class="tick xtick" x="102.5" y="170" text-anchor="end" transform="rotate(-40 102.5 170)">Easier</text>
+<text class="tick xtick" x="165.0" y="170" text-anchor="end" transform="rotate(-40 165.0 170)">Unpert.</text>
+<text class="tick xtick" x="227.5" y="170" text-anchor="end" transform="rotate(-40 227.5 170)">Harder</text>
+<text class="tick xtick" x="290.0" y="170" text-anchor="end" transform="rotate(-40 290.0 170)">Hardest</text>
+<path class="ln g1 solid" d="M40.0 66.2 L102.5 59.0 L165.0 52.0 L227.5 62.4 L290.0 63.4"/>
+<circle class="pt g1" cx="40.0" cy="66.2" r="2.6"/>
+<circle class="hit" cx="40.0" cy="66.2" r="9"><title>NoSkip U-Net · Easiest · Dice 0.690</title></circle>
+<circle class="pt g1" cx="102.5" cy="59.0" r="2.6"/>
+<circle class="hit" cx="102.5" cy="59.0" r="9"><title>NoSkip U-Net · Easier · Dice 0.746</title></circle>
+<circle class="pt g1" cx="165.0" cy="52.0" r="2.6"/>
+<circle class="hit" cx="165.0" cy="52.0" r="9"><title>NoSkip U-Net · Unperturbed · Dice 0.800</title></circle>
+<circle class="pt g1" cx="227.5" cy="62.4" r="2.6"/>
+<circle class="hit" cx="227.5" cy="62.4" r="9"><title>NoSkip U-Net · Harder · Dice 0.720</title></circle>
+<circle class="pt g1" cx="290.0" cy="63.4" r="2.6"/>
+<circle class="hit" cx="290.0" cy="63.4" r="9"><title>NoSkip U-Net · Hardest · Dice 0.713</title></circle>
+<path class="ln g1 dash" d="M40.0 68.9 L102.5 61.4 L165.0 49.7 L227.5 56.9 L290.0 60.5"/>
+<circle class="pt g1" cx="40.0" cy="68.9" r="2.6"/>
+<circle class="hit" cx="40.0" cy="68.9" r="9"><title>NoSkip V-Net · Easiest · Dice 0.670</title></circle>
+<circle class="pt g1" cx="102.5" cy="61.4" r="2.6"/>
+<circle class="hit" cx="102.5" cy="61.4" r="9"><title>NoSkip V-Net · Easier · Dice 0.728</title></circle>
+<circle class="pt g1" cx="165.0" cy="49.7" r="2.6"/>
+<circle class="hit" cx="165.0" cy="49.7" r="9"><title>NoSkip V-Net · Unperturbed · Dice 0.818</title></circle>
+<circle class="pt g1" cx="227.5" cy="56.9" r="2.6"/>
+<circle class="hit" cx="227.5" cy="56.9" r="9"><title>NoSkip V-Net · Harder · Dice 0.762</title></circle>
+<circle class="pt g1" cx="290.0" cy="60.5" r="2.6"/>
+<circle class="hit" cx="290.0" cy="60.5" r="9"><title>NoSkip V-Net · Hardest · Dice 0.734</title></circle>
+<path class="ln g2 solid" d="M40.0 66.0 L102.5 59.6 L165.0 52.1 L227.5 61.1 L290.0 63.1"/>
+<circle class="pt g2" cx="40.0" cy="66.0" r="2.6"/>
+<circle class="hit" cx="40.0" cy="66.0" r="9"><title>U-Net · Easiest · Dice 0.693</title></circle>
+<circle class="pt g2" cx="102.5" cy="59.6" r="2.6"/>
+<circle class="hit" cx="102.5" cy="59.6" r="9"><title>U-Net · Easier · Dice 0.742</title></circle>
+<circle class="pt g2" cx="165.0" cy="52.1" r="2.6"/>
+<circle class="hit" cx="165.0" cy="52.1" r="9"><title>U-Net · Unperturbed · Dice 0.799</title></circle>
+<circle class="pt g2" cx="227.5" cy="61.1" r="2.6"/>
+<circle class="hit" cx="227.5" cy="61.1" r="9"><title>U-Net · Harder · Dice 0.730</title></circle>
+<circle class="pt g2" cx="290.0" cy="63.1" r="2.6"/>
+<circle class="hit" cx="290.0" cy="63.1" r="9"><title>U-Net · Hardest · Dice 0.715</title></circle>
+<path class="ln g2 dash" d="M40.0 63.3 L102.5 59.6 L165.0 53.8 L227.5 57.6 L290.0 59.6"/>
+<circle class="pt g2" cx="40.0" cy="63.3" r="2.6"/>
+<circle class="hit" cx="40.0" cy="63.3" r="9"><title>V-Net · Easiest · Dice 0.713</title></circle>
+<circle class="pt g2" cx="102.5" cy="59.6" r="2.6"/>
+<circle class="hit" cx="102.5" cy="59.6" r="9"><title>V-Net · Easier · Dice 0.742</title></circle>
+<circle class="pt g2" cx="165.0" cy="53.8" r="2.6"/>
+<circle class="hit" cx="165.0" cy="53.8" r="9"><title>V-Net · Unperturbed · Dice 0.786</title></circle>
+<circle class="pt g2" cx="227.5" cy="57.6" r="2.6"/>
+<circle class="hit" cx="227.5" cy="57.6" r="9"><title>V-Net · Harder · Dice 0.757</title></circle>
+<circle class="pt g2" cx="290.0" cy="59.6" r="2.6"/>
+<circle class="hit" cx="290.0" cy="59.6" r="9"><title>V-Net · Hardest · Dice 0.741</title></circle>
+<path class="ln g3 solid" d="M40.0 62.3 L102.5 54.2 L165.0 49.8 L227.5 59.6 L290.0 65.5"/>
+<circle class="pt g3" cx="40.0" cy="62.3" r="2.6"/>
+<circle class="hit" cx="40.0" cy="62.3" r="9"><title>AGU-Net · Easiest · Dice 0.720</title></circle>
+<circle class="pt g3" cx="102.5" cy="54.2" r="2.6"/>
+<circle class="hit" cx="102.5" cy="54.2" r="9"><title>AGU-Net · Easier · Dice 0.783</title></circle>
+<circle class="pt g3" cx="165.0" cy="49.8" r="2.6"/>
+<circle class="hit" cx="165.0" cy="49.8" r="9"><title>AGU-Net · Unperturbed · Dice 0.817</title></circle>
+<circle class="pt g3" cx="227.5" cy="59.6" r="2.6"/>
+<circle class="hit" cx="227.5" cy="59.6" r="9"><title>AGU-Net · Harder · Dice 0.741</title></circle>
+<circle class="pt g3" cx="290.0" cy="65.5" r="2.6"/>
+<circle class="hit" cx="290.0" cy="65.5" r="9"><title>AGU-Net · Hardest · Dice 0.697</title></circle>
+<path class="ln g3 dash" d="M40.0 62.7 L102.5 55.7 L165.0 49.4 L227.5 62.4 L290.0 64.5"/>
+<circle class="pt g3" cx="40.0" cy="62.7" r="2.6"/>
+<circle class="hit" cx="40.0" cy="62.7" r="9"><title>U-Net++ · Easiest · Dice 0.718</title></circle>
+<circle class="pt g3" cx="102.5" cy="55.7" r="2.6"/>
+<circle class="hit" cx="102.5" cy="55.7" r="9"><title>U-Net++ · Easier · Dice 0.771</title></circle>
+<circle class="pt g3" cx="165.0" cy="49.4" r="2.6"/>
+<circle class="hit" cx="165.0" cy="49.4" r="9"><title>U-Net++ · Unperturbed · Dice 0.820</title></circle>
+<circle class="pt g3" cx="227.5" cy="62.4" r="2.6"/>
+<circle class="hit" cx="227.5" cy="62.4" r="9"><title>U-Net++ · Harder · Dice 0.720</title></circle>
+<circle class="pt g3" cx="290.0" cy="64.5" r="2.6"/>
+<circle class="hit" cx="290.0" cy="64.5" r="9"><title>U-Net++ · Hardest · Dice 0.703</title></circle>
+<line class="axis" x1="40" y1="156.0" x2="290" y2="156.0"/>
+</svg>
+<svg class="facet" viewBox="0 0 300 196" role="img" aria-label="Mean Dice for Left atrium (heart MRI)">
+<text class="facet-title" x="40" y="14">Left atrium (heart MRI)</text>
+<line class="grid" x1="40" y1="156.0" x2="290" y2="156.0"/>
+<text class="tick" x="34" y="159.5" text-anchor="end">0.00</text>
+<line class="grid" x1="40" y1="123.5" x2="290" y2="123.5"/>
+<text class="tick" x="34" y="127.0" text-anchor="end">0.25</text>
+<line class="grid" x1="40" y1="91.0" x2="290" y2="91.0"/>
+<text class="tick" x="34" y="94.5" text-anchor="end">0.50</text>
+<line class="grid" x1="40" y1="58.5" x2="290" y2="58.5"/>
+<text class="tick" x="34" y="62.0" text-anchor="end">0.75</text>
+<line class="grid" x1="40" y1="26.0" x2="290" y2="26.0"/>
+<text class="tick" x="34" y="29.5" text-anchor="end">1.00</text>
+<text class="tick xtick" x="40.0" y="170" text-anchor="end" transform="rotate(-40 40.0 170)">Easiest</text>
+<text class="tick xtick" x="102.5" y="170" text-anchor="end" transform="rotate(-40 102.5 170)">Easier</text>
+<text class="tick xtick" x="165.0" y="170" text-anchor="end" transform="rotate(-40 165.0 170)">Unpert.</text>
+<text class="tick xtick" x="227.5" y="170" text-anchor="end" transform="rotate(-40 227.5 170)">Harder</text>
+<text class="tick xtick" x="290.0" y="170" text-anchor="end" transform="rotate(-40 290.0 170)">Hardest</text>
+<path class="ln g1 solid" d="M40.0 51.3 L102.5 49.0 L165.0 47.7 L227.5 50.2 L290.0 57.0"/>
+<circle class="pt g1" cx="40.0" cy="51.3" r="2.6"/>
+<circle class="hit" cx="40.0" cy="51.3" r="9"><title>NoSkip U-Net · Easiest · Dice 0.805</title></circle>
+<circle class="pt g1" cx="102.5" cy="49.0" r="2.6"/>
+<circle class="hit" cx="102.5" cy="49.0" r="9"><title>NoSkip U-Net · Easier · Dice 0.823</title></circle>
+<circle class="pt g1" cx="165.0" cy="47.7" r="2.6"/>
+<circle class="hit" cx="165.0" cy="47.7" r="9"><title>NoSkip U-Net · Unperturbed · Dice 0.833</title></circle>
+<circle class="pt g1" cx="227.5" cy="50.2" r="2.6"/>
+<circle class="hit" cx="227.5" cy="50.2" r="9"><title>NoSkip U-Net · Harder · Dice 0.814</title></circle>
+<circle class="pt g1" cx="290.0" cy="57.0" r="2.6"/>
+<circle class="hit" cx="290.0" cy="57.0" r="9"><title>NoSkip U-Net · Hardest · Dice 0.761</title></circle>
+<path class="ln g1 dash" d="M40.0 44.9 L102.5 42.6 L165.0 41.4 L227.5 41.7 L290.0 42.8"/>
+<circle class="pt g1" cx="40.0" cy="44.9" r="2.6"/>
+<circle class="hit" cx="40.0" cy="44.9" r="9"><title>NoSkip V-Net · Easiest · Dice 0.854</title></circle>
+<circle class="pt g1" cx="102.5" cy="42.6" r="2.6"/>
+<circle class="hit" cx="102.5" cy="42.6" r="9"><title>NoSkip V-Net · Easier · Dice 0.872</title></circle>
+<circle class="pt g1" cx="165.0" cy="41.4" r="2.6"/>
+<circle class="hit" cx="165.0" cy="41.4" r="9"><title>NoSkip V-Net · Unperturbed · Dice 0.882</title></circle>
+<circle class="pt g1" cx="227.5" cy="41.7" r="2.6"/>
+<circle class="hit" cx="227.5" cy="41.7" r="9"><title>NoSkip V-Net · Harder · Dice 0.879</title></circle>
+<circle class="pt g1" cx="290.0" cy="42.8" r="2.6"/>
+<circle class="hit" cx="290.0" cy="42.8" r="9"><title>NoSkip V-Net · Hardest · Dice 0.871</title></circle>
+<path class="ln g2 solid" d="M40.0 59.8 L102.5 51.3 L165.0 38.9 L227.5 92.0 L290.0 146.1"/>
+<circle class="pt g2" cx="40.0" cy="59.8" r="2.6"/>
+<circle class="hit" cx="40.0" cy="59.8" r="9"><title>U-Net · Easiest · Dice 0.740</title></circle>
+<circle class="pt g2" cx="102.5" cy="51.3" r="2.6"/>
+<circle class="hit" cx="102.5" cy="51.3" r="9"><title>U-Net · Easier · Dice 0.805</title></circle>
+<circle class="pt g2" cx="165.0" cy="38.9" r="2.6"/>
+<circle class="hit" cx="165.0" cy="38.9" r="9"><title>U-Net · Unperturbed · Dice 0.901</title></circle>
+<circle class="pt g2" cx="227.5" cy="92.0" r="2.6"/>
+<circle class="hit" cx="227.5" cy="92.0" r="9"><title>U-Net · Harder · Dice 0.492</title></circle>
+<circle class="pt g2" cx="290.0" cy="146.1" r="2.6"/>
+<circle class="hit" cx="290.0" cy="146.1" r="9"><title>U-Net · Hardest · Dice 0.076</title></circle>
+<path class="ln g2 dash" d="M40.0 42.7 L102.5 39.5 L165.0 35.8 L227.5 39.9 L290.0 54.1"/>
+<circle class="pt g2" cx="40.0" cy="42.7" r="2.6"/>
+<circle class="hit" cx="40.0" cy="42.7" r="9"><title>V-Net · Easiest · Dice 0.872</title></circle>
+<circle class="pt g2" cx="102.5" cy="39.5" r="2.6"/>
+<circle class="hit" cx="102.5" cy="39.5" r="9"><title>V-Net · Easier · Dice 0.896</title></circle>
+<circle class="pt g2" cx="165.0" cy="35.8" r="2.6"/>
+<circle class="hit" cx="165.0" cy="35.8" r="9"><title>V-Net · Unperturbed · Dice 0.925</title></circle>
+<circle class="pt g2" cx="227.5" cy="39.9" r="2.6"/>
+<circle class="hit" cx="227.5" cy="39.9" r="9"><title>V-Net · Harder · Dice 0.893</title></circle>
+<circle class="pt g2" cx="290.0" cy="54.1" r="2.6"/>
+<circle class="hit" cx="290.0" cy="54.1" r="9"><title>V-Net · Hardest · Dice 0.784</title></circle>
+<path class="ln g3 solid" d="M40.0 48.6 L102.5 40.3 L165.0 35.2 L227.5 137.5 L290.0 151.7"/>
+<circle class="pt g3" cx="40.0" cy="48.6" r="2.6"/>
+<circle class="hit" cx="40.0" cy="48.6" r="9"><title>AGU-Net · Easiest · Dice 0.827</title></circle>
+<circle class="pt g3" cx="102.5" cy="40.3" r="2.6"/>
+<circle class="hit" cx="102.5" cy="40.3" r="9"><title>AGU-Net · Easier · Dice 0.890</title></circle>
+<circle class="pt g3" cx="165.0" cy="35.2" r="2.6"/>
+<circle class="hit" cx="165.0" cy="35.2" r="9"><title>AGU-Net · Unperturbed · Dice 0.929</title></circle>
+<circle class="pt g3" cx="227.5" cy="137.5" r="2.6"/>
+<circle class="hit" cx="227.5" cy="137.5" r="9"><title>AGU-Net · Harder · Dice 0.142</title></circle>
+<circle class="pt g3" cx="290.0" cy="151.7" r="2.6"/>
+<circle class="hit" cx="290.0" cy="151.7" r="9"><title>AGU-Net · Hardest · Dice 0.033</title></circle>
+<path class="ln g3 dash" d="M40.0 151.6 L102.5 153.8 L165.0 35.7 L227.5 155.0 L290.0 156.0"/>
+<circle class="pt g3" cx="40.0" cy="151.6" r="2.6"/>
+<circle class="hit" cx="40.0" cy="151.6" r="9"><title>U-Net++ · Easiest · Dice 0.034</title></circle>
+<circle class="pt g3" cx="102.5" cy="153.8" r="2.6"/>
+<circle class="hit" cx="102.5" cy="153.8" r="9"><title>U-Net++ · Easier · Dice 0.017</title></circle>
+<circle class="pt g3" cx="165.0" cy="35.7" r="2.6"/>
+<circle class="hit" cx="165.0" cy="35.7" r="9"><title>U-Net++ · Unperturbed · Dice 0.925</title></circle>
+<circle class="pt g3" cx="227.5" cy="155.0" r="2.6"/>
+<circle class="hit" cx="227.5" cy="155.0" r="9"><title>U-Net++ · Harder · Dice 0.008</title></circle>
+<circle class="pt g3" cx="290.0" cy="156.0" r="2.6"/>
+<circle class="hit" cx="290.0" cy="156.0" r="9"><title>U-Net++ · Hardest · Dice 0.000</title></circle>
+<line class="axis" x1="40" y1="156.0" x2="290" y2="156.0"/>
+</svg>
+<svg class="facet" viewBox="0 0 300 196" role="img" aria-label="Mean Dice for Spleen (CT)">
+<text class="facet-title" x="40" y="14">Spleen (CT)</text>
+<line class="grid" x1="40" y1="156.0" x2="290" y2="156.0"/>
+<text class="tick" x="34" y="159.5" text-anchor="end">0.00</text>
+<line class="grid" x1="40" y1="123.5" x2="290" y2="123.5"/>
+<text class="tick" x="34" y="127.0" text-anchor="end">0.25</text>
+<line class="grid" x1="40" y1="91.0" x2="290" y2="91.0"/>
+<text class="tick" x="34" y="94.5" text-anchor="end">0.50</text>
+<line class="grid" x1="40" y1="58.5" x2="290" y2="58.5"/>
+<text class="tick" x="34" y="62.0" text-anchor="end">0.75</text>
+<line class="grid" x1="40" y1="26.0" x2="290" y2="26.0"/>
+<text class="tick" x="34" y="29.5" text-anchor="end">1.00</text>
+<text class="tick xtick" x="40.0" y="170" text-anchor="end" transform="rotate(-40 40.0 170)">Easiest</text>
+<text class="tick xtick" x="102.5" y="170" text-anchor="end" transform="rotate(-40 102.5 170)">Easier</text>
+<text class="tick xtick" x="165.0" y="170" text-anchor="end" transform="rotate(-40 165.0 170)">Unpert.</text>
+<text class="tick xtick" x="227.5" y="170" text-anchor="end" transform="rotate(-40 227.5 170)">Harder</text>
+<text class="tick xtick" x="290.0" y="170" text-anchor="end" transform="rotate(-40 290.0 170)">Hardest</text>
+<path class="ln g1 solid" d="M40.0 142.3 L102.5 120.7 L165.0 77.2 L227.5 83.0 L290.0 99.5"/>
+<circle class="pt g1" cx="40.0" cy="142.3" r="2.6"/>
+<circle class="hit" cx="40.0" cy="142.3" r="9"><title>NoSkip U-Net · Easiest · Dice 0.105</title></circle>
+<circle class="pt g1" cx="102.5" cy="120.7" r="2.6"/>
+<circle class="hit" cx="102.5" cy="120.7" r="9"><title>NoSkip U-Net · Easier · Dice 0.271</title></circle>
+<circle class="pt g1" cx="165.0" cy="77.2" r="2.6"/>
+<circle class="hit" cx="165.0" cy="77.2" r="9"><title>NoSkip U-Net · Unperturbed · Dice 0.606</title></circle>
+<circle class="pt g1" cx="227.5" cy="83.0" r="2.6"/>
+<circle class="hit" cx="227.5" cy="83.0" r="9"><title>NoSkip U-Net · Harder · Dice 0.562</title></circle>
+<circle class="pt g1" cx="290.0" cy="99.5" r="2.6"/>
+<circle class="hit" cx="290.0" cy="99.5" r="9"><title>NoSkip U-Net · Hardest · Dice 0.434</title></circle>
+<path class="ln g1 dash" d="M40.0 137.7 L102.5 127.1 L165.0 60.8 L227.5 102.1 L290.0 115.0"/>
+<circle class="pt g1" cx="40.0" cy="137.7" r="2.6"/>
+<circle class="hit" cx="40.0" cy="137.7" r="9"><title>NoSkip V-Net · Easiest · Dice 0.141</title></circle>
+<circle class="pt g1" cx="102.5" cy="127.1" r="2.6"/>
+<circle class="hit" cx="102.5" cy="127.1" r="9"><title>NoSkip V-Net · Easier · Dice 0.223</title></circle>
+<circle class="pt g1" cx="165.0" cy="60.8" r="2.6"/>
+<circle class="hit" cx="165.0" cy="60.8" r="9"><title>NoSkip V-Net · Unperturbed · Dice 0.732</title></circle>
+<circle class="pt g1" cx="227.5" cy="102.1" r="2.6"/>
+<circle class="hit" cx="227.5" cy="102.1" r="9"><title>NoSkip V-Net · Harder · Dice 0.415</title></circle>
+<circle class="pt g1" cx="290.0" cy="115.0" r="2.6"/>
+<circle class="hit" cx="290.0" cy="115.0" r="9"><title>NoSkip V-Net · Hardest · Dice 0.315</title></circle>
+<path class="ln g2 solid" d="M40.0 153.0 L102.5 142.1 L165.0 59.0 L227.5 145.9 L290.0 152.8"/>
+<circle class="pt g2" cx="40.0" cy="153.0" r="2.6"/>
+<circle class="hit" cx="40.0" cy="153.0" r="9"><title>U-Net · Easiest · Dice 0.023</title></circle>
+<circle class="pt g2" cx="102.5" cy="142.1" r="2.6"/>
+<circle class="hit" cx="102.5" cy="142.1" r="9"><title>U-Net · Easier · Dice 0.107</title></circle>
+<circle class="pt g2" cx="165.0" cy="59.0" r="2.6"/>
+<circle class="hit" cx="165.0" cy="59.0" r="9"><title>U-Net · Unperturbed · Dice 0.746</title></circle>
+<circle class="pt g2" cx="227.5" cy="145.9" r="2.6"/>
+<circle class="hit" cx="227.5" cy="145.9" r="9"><title>U-Net · Harder · Dice 0.078</title></circle>
+<circle class="pt g2" cx="290.0" cy="152.8" r="2.6"/>
+<circle class="hit" cx="290.0" cy="152.8" r="9"><title>U-Net · Hardest · Dice 0.025</title></circle>
+<path class="ln g2 dash" d="M40.0 155.9 L102.5 145.3 L165.0 35.7 L227.5 148.6 L290.0 155.9"/>
+<circle class="pt g2" cx="40.0" cy="155.9" r="2.6"/>
+<circle class="hit" cx="40.0" cy="155.9" r="9"><title>V-Net · Easiest · Dice 0.000</title></circle>
+<circle class="pt g2" cx="102.5" cy="145.3" r="2.6"/>
+<circle class="hit" cx="102.5" cy="145.3" r="9"><title>V-Net · Easier · Dice 0.082</title></circle>
+<circle class="pt g2" cx="165.0" cy="35.7" r="2.6"/>
+<circle class="hit" cx="165.0" cy="35.7" r="9"><title>V-Net · Unperturbed · Dice 0.925</title></circle>
+<circle class="pt g2" cx="227.5" cy="148.6" r="2.6"/>
+<circle class="hit" cx="227.5" cy="148.6" r="9"><title>V-Net · Harder · Dice 0.057</title></circle>
+<circle class="pt g2" cx="290.0" cy="155.9" r="2.6"/>
+<circle class="hit" cx="290.0" cy="155.9" r="9"><title>V-Net · Hardest · Dice 0.001</title></circle>
+<path class="ln g3 solid" d="M40.0 149.1 L102.5 117.1 L165.0 35.4 L227.5 115.9 L290.0 128.1"/>
+<circle class="pt g3" cx="40.0" cy="149.1" r="2.6"/>
+<circle class="hit" cx="40.0" cy="149.1" r="9"><title>AGU-Net · Easiest · Dice 0.053</title></circle>
+<circle class="pt g3" cx="102.5" cy="117.1" r="2.6"/>
+<circle class="hit" cx="102.5" cy="117.1" r="9"><title>AGU-Net · Easier · Dice 0.299</title></circle>
+<circle class="pt g3" cx="165.0" cy="35.4" r="2.6"/>
+<circle class="hit" cx="165.0" cy="35.4" r="9"><title>AGU-Net · Unperturbed · Dice 0.928</title></circle>
+<circle class="pt g3" cx="227.5" cy="115.9" r="2.6"/>
+<circle class="hit" cx="227.5" cy="115.9" r="9"><title>AGU-Net · Harder · Dice 0.308</title></circle>
+<circle class="pt g3" cx="290.0" cy="128.1" r="2.6"/>
+<circle class="hit" cx="290.0" cy="128.1" r="9"><title>AGU-Net · Hardest · Dice 0.215</title></circle>
+<path class="ln g3 dash" d="M40.0 154.7 L102.5 146.7 L165.0 38.0 L227.5 156.0 L290.0 156.0"/>
+<circle class="pt g3" cx="40.0" cy="154.7" r="2.6"/>
+<circle class="hit" cx="40.0" cy="154.7" r="9"><title>U-Net++ · Easiest · Dice 0.010</title></circle>
+<circle class="pt g3" cx="102.5" cy="146.7" r="2.6"/>
+<circle class="hit" cx="102.5" cy="146.7" r="9"><title>U-Net++ · Easier · Dice 0.072</title></circle>
+<circle class="pt g3" cx="165.0" cy="38.0" r="2.6"/>
+<circle class="hit" cx="165.0" cy="38.0" r="9"><title>U-Net++ · Unperturbed · Dice 0.908</title></circle>
+<circle class="pt g3" cx="227.5" cy="156.0" r="2.6"/>
+<circle class="hit" cx="227.5" cy="156.0" r="9"><title>U-Net++ · Harder · Dice 0.000</title></circle>
+<circle class="pt g3" cx="290.0" cy="156.0" r="2.6"/>
+<circle class="hit" cx="290.0" cy="156.0" r="9"><title>U-Net++ · Hardest · Dice 0.000</title></circle>
+<line class="axis" x1="40" y1="156.0" x2="290" y2="156.0"/>
+</svg>
+    </div>
+    <p class="lead" style="font-size:0.87rem">Every point is also in the table below, and in
+    <a href="data/dice-summary.csv">dice-summary.csv</a>.</p>
+
+    <h3>Mean Dice, all runs</h3>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Architecture</th><th>Easiest</th><th>Easier</th><th>Unperturbed</th><th>Harder</th><th>Hardest</th><th>Unpert. &rarr; hardest</th></tr></thead>
+        <tbody>
+<tr class="dsrow"><th colspan="7" scope="colgroup">Breast ultrasound (BUSI)</th></tr>
+<tr><th scope="row"><span class="sw g1"></span>NoSkip U-Net</th><td>0.744</td><td>0.749</td><td>0.761</td><td>0.735</td><td>0.620</td><td class="drop">&minus;0.141</td></tr>
+<tr><th scope="row"><span class="sw g1"></span>NoSkip V-Net</th><td>0.743</td><td>0.762</td><td>0.760</td><td>0.752</td><td>0.730</td><td class="drop">&minus;0.030</td></tr>
+<tr><th scope="row"><span class="sw g2"></span>U-Net</th><td>0.745</td><td>0.736</td><td>0.763</td><td>0.723</td><td>0.607</td><td class="drop">&minus;0.155</td></tr>
+<tr><th scope="row"><span class="sw g2"></span>V-Net</th><td>0.713</td><td>0.717</td><td>0.724</td><td>0.712</td><td>0.690</td><td class="drop">&minus;0.034</td></tr>
+<tr><th scope="row"><span class="sw g3"></span>AGU-Net</th><td>0.804</td><td>0.799</td><td>0.795</td><td>0.646</td><td>0.484</td><td class="drop">&minus;0.311</td></tr>
+<tr><th scope="row"><span class="sw g3"></span>U-Net++</th><td>0.746</td><td>0.714</td><td>0.733</td><td>0.432</td><td>0.165</td><td class="drop">&minus;0.567</td></tr>
+<tr class="dsrow"><th colspan="7" scope="colgroup">Colon histology (GLaS)</th></tr>
+<tr><th scope="row"><span class="sw g1"></span>NoSkip U-Net</th><td>0.690</td><td>0.746</td><td>0.800</td><td>0.720</td><td>0.713</td><td class="drop">&minus;0.087</td></tr>
+<tr><th scope="row"><span class="sw g1"></span>NoSkip V-Net</th><td>0.670</td><td>0.728</td><td>0.818</td><td>0.762</td><td>0.734</td><td class="drop">&minus;0.083</td></tr>
+<tr><th scope="row"><span class="sw g2"></span>U-Net</th><td>0.693</td><td>0.742</td><td>0.799</td><td>0.730</td><td>0.715</td><td class="drop">&minus;0.085</td></tr>
+<tr><th scope="row"><span class="sw g2"></span>V-Net</th><td>0.713</td><td>0.742</td><td>0.786</td><td>0.757</td><td>0.741</td><td class="drop">&minus;0.045</td></tr>
+<tr><th scope="row"><span class="sw g3"></span>AGU-Net</th><td>0.720</td><td>0.783</td><td>0.817</td><td>0.741</td><td>0.697</td><td class="drop">&minus;0.120</td></tr>
+<tr><th scope="row"><span class="sw g3"></span>U-Net++</th><td>0.718</td><td>0.771</td><td>0.820</td><td>0.720</td><td>0.703</td><td class="drop">&minus;0.117</td></tr>
+<tr class="dsrow"><th colspan="7" scope="colgroup">Left atrium (heart MRI)</th></tr>
+<tr><th scope="row"><span class="sw g1"></span>NoSkip U-Net</th><td>0.805</td><td>0.823</td><td>0.833</td><td>0.814</td><td>0.761</td><td class="drop">&minus;0.072</td></tr>
+<tr><th scope="row"><span class="sw g1"></span>NoSkip V-Net</th><td>0.854</td><td>0.872</td><td>0.882</td><td>0.879</td><td>0.871</td><td class="drop">&minus;0.011</td></tr>
+<tr><th scope="row"><span class="sw g2"></span>U-Net</th><td>0.740</td><td>0.805</td><td>0.901</td><td>0.492</td><td>0.076</td><td class="drop">&minus;0.824</td></tr>
+<tr><th scope="row"><span class="sw g2"></span>V-Net</th><td>0.872</td><td>0.896</td><td>0.925</td><td>0.893</td><td>0.784</td><td class="drop">&minus;0.141</td></tr>
+<tr><th scope="row"><span class="sw g3"></span>AGU-Net</th><td>0.827</td><td>0.890</td><td>0.929</td><td>0.142</td><td>0.033</td><td class="drop">&minus;0.896</td></tr>
+<tr><th scope="row"><span class="sw g3"></span>U-Net++</th><td>0.034</td><td>0.017</td><td>0.925</td><td>0.008</td><td>0.000</td><td class="drop">&minus;0.925</td></tr>
+<tr class="dsrow"><th colspan="7" scope="colgroup">Spleen (CT)</th></tr>
+<tr><th scope="row"><span class="sw g1"></span>NoSkip U-Net</th><td>0.105</td><td>0.271</td><td>0.606</td><td>0.562</td><td>0.434</td><td class="drop">&minus;0.172</td></tr>
+<tr><th scope="row"><span class="sw g1"></span>NoSkip V-Net</th><td>0.141</td><td>0.223</td><td>0.732</td><td>0.415</td><td>0.315</td><td class="drop">&minus;0.417</td></tr>
+<tr><th scope="row"><span class="sw g2"></span>U-Net</th><td>0.023</td><td>0.107</td><td>0.746</td><td>0.078</td><td>0.025</td><td class="drop">&minus;0.721</td></tr>
+<tr><th scope="row"><span class="sw g2"></span>V-Net</th><td>0.000</td><td>0.082</td><td>0.925</td><td>0.057</td><td>0.001</td><td class="drop">&minus;0.924</td></tr>
+<tr><th scope="row"><span class="sw g3"></span>AGU-Net</th><td>0.053</td><td>0.299</td><td>0.928</td><td>0.308</td><td>0.215</td><td class="drop">&minus;0.713</td></tr>
+<tr><th scope="row"><span class="sw g3"></span>U-Net++</th><td>0.010</td><td>0.072</td><td>0.908</td><td>0.000</td><td>0.000</td><td class="drop">&minus;0.908</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The last column is the drop from the unperturbed test set to the hardest one. Read down it
+    and the pattern is hard to miss: within every dataset, the no-skip models give up the least.
+    On spleen CT every architecture suffers, but the no-skip pair retains roughly half its
+    performance while the others go to near zero.</p>
+  </section>
+
+  <section id="practice">
+    <h2>What to do with this</h2>
+    <ul>
+      <li><strong>Measure the task before choosing the architecture.</strong> If foreground and
+      background are texturally distinct, the extra skip machinery is not buying much.</li>
+      <li><strong>Report degradation, not just the mean.</strong> A model that scores 0.93 clean and
+      0.00 perturbed is not a 0.93 model.</li>
+      <li><strong>Treat no-skip as a real baseline.</strong> For deployment across scanners and
+      sites, the least elaborate architecture was repeatedly the most dependable one here.</li>
+    </ul>
+  </section>
+
+  <section id="citation">
+    <h2>Citation</h2>
+<pre>@inproceedings{kamath2023we,
+  title     = {Do we really need that skip-connection? Understanding its interplay with task complexity},
+  author    = {Kamath, Amith and Willmann, Jonas and Andratschke, Nicolaus and Reyes, Mauricio},
+  booktitle = {International Conference on Medical Image Computing and Computer-Assisted Intervention},
+  pages     = {302--311},
+  year      = {2023},
+  organization = {Springer}
+}</pre>
+<pre>@article{kamath2025impact,
+  title     = {The impact of U-Net architecture choices and skip connections on the robustness of segmentation across texture variations},
+  author    = {Kamath, Amith and Willmann, Jonas and Andratschke, Nicolaus and Reyes, Mauricio},
+  journal   = {Computers in Biology and Medicine},
+  volume    = {184},
+  pages     = {109364},
+  year      = {2025},
+  publisher = {Elsevier}
+}</pre>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Part of a wider thread on
+    <a href="https://amithjkamath.github.io/projects/Theme-Robustness/">robust segmentation models</a>.
+    Code and data pointers at
+    <a href="https://github.com/amithjkamath/to_skip_or_not">github.com/amithjkamath/to_skip_or_not</a>.</p>
+  </div>
+</footer>
+
+</body>
+</html>

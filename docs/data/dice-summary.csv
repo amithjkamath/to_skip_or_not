@@ -1,0 +1,121 @@
+dataset,architecture,perturbation,mean_dice,n_seeds
+Breast ultrasound (BUSI),NoSkip U-Net,Easiest,0.7442,3
+Breast ultrasound (BUSI),NoSkip U-Net,Easier,0.7485,3
+Breast ultrasound (BUSI),NoSkip U-Net,Unperturbed,0.7610,3
+Breast ultrasound (BUSI),NoSkip U-Net,Harder,0.7351,3
+Breast ultrasound (BUSI),NoSkip U-Net,Hardest,0.6198,3
+Breast ultrasound (BUSI),NoSkip V-Net,Easiest,0.7429,3
+Breast ultrasound (BUSI),NoSkip V-Net,Easier,0.7619,3
+Breast ultrasound (BUSI),NoSkip V-Net,Unperturbed,0.7597,3
+Breast ultrasound (BUSI),NoSkip V-Net,Harder,0.7515,3
+Breast ultrasound (BUSI),NoSkip V-Net,Hardest,0.7298,3
+Breast ultrasound (BUSI),U-Net,Easiest,0.7448,3
+Breast ultrasound (BUSI),U-Net,Easier,0.7360,3
+Breast ultrasound (BUSI),U-Net,Unperturbed,0.7626,3
+Breast ultrasound (BUSI),U-Net,Harder,0.7234,3
+Breast ultrasound (BUSI),U-Net,Hardest,0.6073,3
+Breast ultrasound (BUSI),V-Net,Easiest,0.7134,3
+Breast ultrasound (BUSI),V-Net,Easier,0.7167,3
+Breast ultrasound (BUSI),V-Net,Unperturbed,0.7237,3
+Breast ultrasound (BUSI),V-Net,Harder,0.7117,3
+Breast ultrasound (BUSI),V-Net,Hardest,0.6899,3
+Breast ultrasound (BUSI),AGU-Net,Easiest,0.8038,3
+Breast ultrasound (BUSI),AGU-Net,Easier,0.7995,3
+Breast ultrasound (BUSI),AGU-Net,Unperturbed,0.7952,3
+Breast ultrasound (BUSI),AGU-Net,Harder,0.6457,3
+Breast ultrasound (BUSI),AGU-Net,Hardest,0.4840,3
+Breast ultrasound (BUSI),U-Net++,Easiest,0.7456,3
+Breast ultrasound (BUSI),U-Net++,Easier,0.7138,3
+Breast ultrasound (BUSI),U-Net++,Unperturbed,0.7327,3
+Breast ultrasound (BUSI),U-Net++,Harder,0.4321,3
+Breast ultrasound (BUSI),U-Net++,Hardest,0.1654,3
+Colon histology (GLaS),NoSkip U-Net,Easiest,0.6904,3
+Colon histology (GLaS),NoSkip U-Net,Easier,0.7462,3
+Colon histology (GLaS),NoSkip U-Net,Unperturbed,0.8000,3
+Colon histology (GLaS),NoSkip U-Net,Harder,0.7198,3
+Colon histology (GLaS),NoSkip U-Net,Hardest,0.7125,3
+Colon histology (GLaS),NoSkip V-Net,Easiest,0.6698,3
+Colon histology (GLaS),NoSkip V-Net,Easier,0.7276,3
+Colon histology (GLaS),NoSkip V-Net,Unperturbed,0.8177,3
+Colon histology (GLaS),NoSkip V-Net,Harder,0.7622,3
+Colon histology (GLaS),NoSkip V-Net,Hardest,0.7343,3
+Colon histology (GLaS),U-Net,Easiest,0.6926,3
+Colon histology (GLaS),U-Net,Easier,0.7416,3
+Colon histology (GLaS),U-Net,Unperturbed,0.7995,3
+Colon histology (GLaS),U-Net,Harder,0.7301,3
+Colon histology (GLaS),U-Net,Hardest,0.7146,3
+Colon histology (GLaS),V-Net,Easiest,0.7131,3
+Colon histology (GLaS),V-Net,Easier,0.7419,3
+Colon histology (GLaS),V-Net,Unperturbed,0.7861,3
+Colon histology (GLaS),V-Net,Harder,0.7568,3
+Colon histology (GLaS),V-Net,Hardest,0.7413,3
+Colon histology (GLaS),AGU-Net,Easiest,0.7205,3
+Colon histology (GLaS),AGU-Net,Easier,0.7832,3
+Colon histology (GLaS),AGU-Net,Unperturbed,0.8167,3
+Colon histology (GLaS),AGU-Net,Harder,0.7414,3
+Colon histology (GLaS),AGU-Net,Hardest,0.6965,3
+Colon histology (GLaS),U-Net++,Easiest,0.7175,3
+Colon histology (GLaS),U-Net++,Easier,0.7712,3
+Colon histology (GLaS),U-Net++,Unperturbed,0.8203,3
+Colon histology (GLaS),U-Net++,Harder,0.7200,3
+Colon histology (GLaS),U-Net++,Hardest,0.7035,3
+Left atrium (heart MRI),NoSkip U-Net,Easiest,0.8052,3
+Left atrium (heart MRI),NoSkip U-Net,Easier,0.8232,3
+Left atrium (heart MRI),NoSkip U-Net,Unperturbed,0.8331,3
+Left atrium (heart MRI),NoSkip U-Net,Harder,0.8138,3
+Left atrium (heart MRI),NoSkip U-Net,Hardest,0.7613,3
+Left atrium (heart MRI),NoSkip V-Net,Easiest,0.8544,3
+Left atrium (heart MRI),NoSkip V-Net,Easier,0.8724,3
+Left atrium (heart MRI),NoSkip V-Net,Unperturbed,0.8819,3
+Left atrium (heart MRI),NoSkip V-Net,Harder,0.8790,3
+Left atrium (heart MRI),NoSkip V-Net,Hardest,0.8710,3
+Left atrium (heart MRI),U-Net,Easiest,0.7404,3
+Left atrium (heart MRI),U-Net,Easier,0.8052,3
+Left atrium (heart MRI),U-Net,Unperturbed,0.9009,3
+Left atrium (heart MRI),U-Net,Harder,0.4922,3
+Left atrium (heart MRI),U-Net,Hardest,0.0765,3
+Left atrium (heart MRI),V-Net,Easiest,0.8718,3
+Left atrium (heart MRI),V-Net,Easier,0.8964,3
+Left atrium (heart MRI),V-Net,Unperturbed,0.9249,3
+Left atrium (heart MRI),V-Net,Harder,0.8932,3
+Left atrium (heart MRI),V-Net,Hardest,0.7841,3
+Left atrium (heart MRI),AGU-Net,Easiest,0.8265,3
+Left atrium (heart MRI),AGU-Net,Easier,0.8898,3
+Left atrium (heart MRI),AGU-Net,Unperturbed,0.9292,3
+Left atrium (heart MRI),AGU-Net,Harder,0.1422,3
+Left atrium (heart MRI),AGU-Net,Hardest,0.0334,3
+Left atrium (heart MRI),U-Net++,Easiest,0.0340,3
+Left atrium (heart MRI),U-Net++,Easier,0.0168,3
+Left atrium (heart MRI),U-Net++,Unperturbed,0.9254,3
+Left atrium (heart MRI),U-Net++,Harder,0.0080,3
+Left atrium (heart MRI),U-Net++,Hardest,0.0002,3
+Spleen (CT),NoSkip U-Net,Easiest,0.1054,3
+Spleen (CT),NoSkip U-Net,Easier,0.2715,3
+Spleen (CT),NoSkip U-Net,Unperturbed,0.6061,3
+Spleen (CT),NoSkip U-Net,Harder,0.5619,3
+Spleen (CT),NoSkip U-Net,Hardest,0.4344,3
+Spleen (CT),NoSkip V-Net,Easiest,0.1411,3
+Spleen (CT),NoSkip V-Net,Easier,0.2226,3
+Spleen (CT),NoSkip V-Net,Unperturbed,0.7323,3
+Spleen (CT),NoSkip V-Net,Harder,0.4145,3
+Spleen (CT),NoSkip V-Net,Hardest,0.3150,3
+Spleen (CT),U-Net,Easiest,0.0227,3
+Spleen (CT),U-Net,Easier,0.1073,3
+Spleen (CT),U-Net,Unperturbed,0.7458,3
+Spleen (CT),U-Net,Harder,0.0781,3
+Spleen (CT),U-Net,Hardest,0.0248,3
+Spleen (CT),V-Net,Easiest,0.0005,3
+Spleen (CT),V-Net,Easier,0.0821,3
+Spleen (CT),V-Net,Unperturbed,0.9252,3
+Spleen (CT),V-Net,Harder,0.0568,3
+Spleen (CT),V-Net,Hardest,0.0011,3
+Spleen (CT),AGU-Net,Easiest,0.0533,3
+Spleen (CT),AGU-Net,Easier,0.2994,3
+Spleen (CT),AGU-Net,Unperturbed,0.9275,3
+Spleen (CT),AGU-Net,Harder,0.3081,3
+Spleen (CT),AGU-Net,Hardest,0.2149,3
+Spleen (CT),U-Net++,Easiest,0.0104,3
+Spleen (CT),U-Net++,Easier,0.0717,3
+Spleen (CT),U-Net++,Unperturbed,0.9075,3
+Spleen (CT),U-Net++,Harder,0.0000,3
+Spleen (CT),U-Net++,Hardest,0.0000,3
